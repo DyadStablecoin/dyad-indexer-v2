@@ -1,6 +1,7 @@
 import { ponder } from "@/generated";
 import { VaultManagerAbi } from "../abis/VaultManagerAbi";
 import { VaultAbi } from "../abis/VaultAbi";
+import { DyadAbi } from "../abis/DyadAbi";
 
 async function getCr(context, id) {
   return await context.client.readContract({
@@ -20,15 +21,26 @@ async function getKerosene(context, id) {
   });
 }
 
+async function getDyad(context, id) {
+  return await context.client.readContract({
+    abi: DyadAbi,
+    address: "0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab",
+    functionName: "mintedDyad",
+    args: [id],
+  });
+}
+
 async function updateNote(event, context) {
   const { Note } = context.db;
   const cr = await getCr(context, event.args.id);
   const kerosene = await getKerosene(context, event.args.id);
+  const dyad = await getDyad(context, event.args.id);
   await Note.upsert({
     id: event.args.id,
     create: {
       collatRatio: cr,
       kerosene: kerosene ?? 0,
+      dyad: dyad,
     },
   });
 }

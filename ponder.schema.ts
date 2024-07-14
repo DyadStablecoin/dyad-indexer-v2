@@ -5,5 +5,6 @@ export default createSchema((p) => ({
     id: p.bigint(),
     collatRatio: p.bigint().optional(),
     kerosene: p.bigint().optional(),
+    dyad: p.bigint().optional(),
   }),
 }));
