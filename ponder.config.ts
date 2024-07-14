@@ -6,6 +6,7 @@ import { VaultManagerV2_0x1342Abi } from "./abis/VaultManagerV2_0x1342Abi";
 import { VaultManagerV3_0x5c1aAbi } from "./abis/VaultManagerV3_0x5c1aAbi";
 import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
 
+// config
 export default createConfig({
   networks: {
     mainnet: { chainId: 1, transport: http(process.env.PONDER_RPC_URL_1) },
