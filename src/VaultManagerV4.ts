@@ -33,10 +33,6 @@ async function updateNote(event, context) {
   });
 }
 
-// ponder.on("VaultManagerV4:Added", async ({ event, context }) => {
-//   updateNote(event, context);
-// });
-
 ponder.on("VaultManagerV4:MintDyad", async ({ event, context }) => {
   updateNote(event, context);
 });
