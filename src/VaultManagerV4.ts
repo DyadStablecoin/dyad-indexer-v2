@@ -32,8 +32,11 @@ async function getDyad(context, id) {
 
 async function updateNote(event, context) {
   const { Note } = context.db;
+  console.log("getting cr");
   const cr = await getCr(context, event.args.id);
+  console.log("getting kerosene");
   const kerosene = await getKerosene(context, event.args.id);
+  console.log("getting dyad");
   const dyad = await getDyad(context, event.args.id);
   await Note.upsert({
     id: event.args.id,
