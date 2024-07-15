@@ -81,5 +81,14 @@ ponder.on("VaultManagerV4:BurnDyad", async ({ event, context }) => {
 
 ponder.on("DNft:MintedNft", async ({ event, context }) => {
   console.log("Minted Nft");
-  updateNote(event, context);
+  const { Note } = context.db;
+  await Note.upsert({
+    id: event.args.id,
+    create: {
+      collatRatio: 0n,
+      kerosene: 0n,
+      dyad: 0n,
+      xp: 0n,
+    },
+  });
 });
