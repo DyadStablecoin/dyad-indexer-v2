@@ -70,9 +70,16 @@ async function updateNote(event, context) {
 }
 
 ponder.on("VaultManagerV4:MintDyad", async ({ event, context }) => {
+  console.log("Minted DYAD");
   updateNote(event, context);
 });
 
 ponder.on("VaultManagerV4:BurnDyad", async ({ event, context }) => {
+  console.log("Burned DYAD");
+  updateNote(event, context);
+});
+
+ponder.on("DNft:MintedNft", async ({ event, context }) => {
+  console.log("Minted Nft");
   updateNote(event, context);
 });
