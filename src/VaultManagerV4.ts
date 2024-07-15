@@ -2,6 +2,9 @@ import { ponder } from "@/generated";
 import { VaultManagerAbi } from "../abis/VaultManagerAbi";
 import { VaultAbi } from "../abis/VaultAbi";
 import { DyadAbi } from "../abis/DyadAbi";
+import { DNftAbi } from "../abis/DNftAbi";
+import { ERC20ABI } from "../abis/ERC20Abi";
+import { XpABI } from "../abis/XpAbi";
 
 async function getCr(context, id) {
   return await context.client.readContract({
@@ -30,7 +33,21 @@ async function getDyad(context, id) {
   });
 }
 
+async function getXP(context, id) {
+  try {
+    return await context.client.readContract({
+      abi: XpABI,
+      address: "0xeF443646E52d1C28bd757F570D18F4Db30dB70F4",
+      functionName: "balanceOfNote",
+      args: [id],
+    });
+  } catch (e) {
+    return 0n;
+  }
+}
+
 async function updateNote(event, context) {
+  console.log("event", event);
   const { Note } = context.db;
   console.log("getting cr");
   const cr = await getCr(context, event.args.id);
@@ -38,12 +55,16 @@ async function updateNote(event, context) {
   const kerosene = await getKerosene(context, event.args.id);
   console.log("getting dyad");
   const dyad = await getDyad(context, event.args.id);
+  console.log("getting XP");
+  const xp = await getXP(context, event.args.id);
+  console.log("upserting", event.args.id, cr, kerosene, dyad);
   await Note.upsert({
     id: event.args.id,
     create: {
       collatRatio: cr,
       kerosene: kerosene ?? 0,
       dyad: dyad,
+      xp: xp,
     },
   });
 }

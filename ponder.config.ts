@@ -21,6 +21,8 @@ export default createConfig({
       ]),
       address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
       network: "mainnet",
+      // startBlock: 20305389,
+      // startBlock: 20200006,
       startBlock: 20055921,
     },
   },
