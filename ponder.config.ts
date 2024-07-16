@@ -25,7 +25,7 @@ export default createConfig({
       network: "mainnet",
       // startBlock: 20305389,
       // startBlock: 20200006,
-      startBlock: 20055921,
+      startBlock: 20013820,
     },
     DNft: {
       abi: DNftAbi,
@@ -33,7 +33,7 @@ export default createConfig({
       network: "mainnet",
       // startBlock: 20305389,
       // startBlock: 20200006,
-      startBlock: 20055921,
+      startBlock: 17733160,
     },
   },
 });

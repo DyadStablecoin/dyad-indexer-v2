@@ -16,21 +16,29 @@ async function getCr(context, id) {
 }
 
 async function getKerosene(context, id) {
-  return await context.client.readContract({
-    abi: VaultAbi,
-    address: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
-    functionName: "id2asset",
-    args: [id],
-  });
+  try {
+    return await context.client.readContract({
+      abi: VaultAbi,
+      address: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
+      functionName: "id2asset",
+      args: [id],
+    });
+  } catch (e) {
+    return 0n;
+  }
 }
 
 async function getDyad(context, id) {
-  return await context.client.readContract({
-    abi: DyadAbi,
-    address: "0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab",
-    functionName: "mintedDyad",
-    args: [id],
-  });
+  try {
+    return await context.client.readContract({
+      abi: DyadAbi,
+      address: "0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab",
+      functionName: "mintedDyad",
+      args: [id],
+    });
+  } catch (e) {
+    return 0n;
+  }
 }
 
 async function getXP(context, id) {
@@ -79,16 +87,25 @@ ponder.on("VaultManagerV4:BurnDyad", async ({ event, context }) => {
   updateNote(event, context);
 });
 
-ponder.on("DNft:MintedNft", async ({ event, context }) => {
-  console.log("Minted Nft");
+async function createNft(context, event) {
   const { Note } = context.db;
-  await Note.upsert({
+  await Note.create({
     id: event.args.id,
-    create: {
+    data: {
       collatRatio: 0n,
       kerosene: 0n,
       dyad: 0n,
       xp: 0n,
     },
   });
+}
+
+ponder.on("DNft:MintedNft", async ({ event, context }) => {
+  console.log("Minted Nft");
+  createNft(context, event);
+});
+
+ponder.on("DNft:MintedInsiderNft", async ({ event, context }) => {
+  console.log("Minted Insider Nft");
+  createNft(context, event);
 });
