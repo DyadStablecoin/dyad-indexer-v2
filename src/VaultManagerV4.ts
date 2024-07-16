@@ -43,7 +43,10 @@ async function getDyad(context, id) {
   }
 }
 
-async function getXP(context, id) {
+async function getXP(context, id, event) {
+  if (event.block.number < 20292276) {
+    return 0n;
+  }
   try {
     return await context.client.readContract({
       abi: XpABI,
@@ -67,7 +70,7 @@ async function updateNote(event, context) {
   console.log("getting dyad");
   const dyad = await getDyad(context, event.args.id);
   console.log("getting XP");
-  const xp = await getXP(context, event.args.id);
+  const xp = await getXP(context, event.args.id, event);
   console.log("updating", event.args.id, cr, kerosene, dyad, xp);
   await Note.update({
     id: event.args.id,
@@ -87,6 +90,16 @@ ponder.on("VaultManagerV4:MintDyad", async ({ event, context }) => {
 
 ponder.on("VaultManagerV4:BurnDyad", async ({ event, context }) => {
   console.log("Burned DYAD");
+  updateNote(event, context);
+});
+
+ponder.on("VaultManagerV4:RedeemDyad", async ({ event, context }) => {
+  console.log("Redeem DYAD");
+  updateNote(event, context);
+});
+
+ponder.on("VaultManagerV4:Liquidate", async ({ event, context }) => {
+  console.log("Liquidate DYAD");
   updateNote(event, context);
 });
 
@@ -116,7 +129,20 @@ ponder.on("DNft:MintedInsiderNft", async ({ event, context }) => {
 ponder.on("KeroseneVault:Deposit", async ({ event, context }) => {
   console.log("Kerosene Deposit");
   console.log("getting kerosene");
-  const xp = await getXP(context, event.args.id);
+  const xp = await getXP(context, event.args.id, event);
+  const { Note } = context.db;
+  await Note.update({
+    id: event.args.id,
+    data: {
+      xp: xp,
+    },
+  });
+});
+
+ponder.on("KeroseneVault:Withdraw", async ({ event, context }) => {
+  console.log("Kerosene Withdraw");
+  console.log("getting kerosene");
+  const xp = await getXP(context, event.args.id, event);
   const { Note } = context.db;
   await Note.update({
     id: event.args.id,

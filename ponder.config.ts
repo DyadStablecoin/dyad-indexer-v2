@@ -8,6 +8,7 @@ import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
 
 import { DNftAbi } from "./abis/DNftAbi";
 import { VaultAbi } from "./abis/VaultAbi";
+import { XpABI } from "./abis/XpAbi";
 
 // config
 export default createConfig({
@@ -41,6 +42,12 @@ export default createConfig({
       address: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
       network: "mainnet",
       startBlock: 20055920,
+    },
+    DyadXP: {
+      abi: XpABI,
+      address: "0xeF443646E52d1C28bd757F570D18F4Db30dB70F4",
+      network: "mainnet",
+      startBlock: 20292276,
     },
   },
 });
