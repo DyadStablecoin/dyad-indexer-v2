@@ -68,10 +68,10 @@ async function updateNote(event, context) {
   const dyad = await getDyad(context, event.args.id);
   console.log("getting XP");
   const xp = await getXP(context, event.args.id);
-  console.log("upserting", event.args.id, cr, kerosene, dyad, xp);
-  await Note.upsert({
+  console.log("updating", event.args.id, cr, kerosene, dyad, xp);
+  await Note.update({
     id: event.args.id,
-    create: {
+    data: {
       collatRatio: cr,
       kerosene: kerosene ?? 0,
       dyad: dyad,
