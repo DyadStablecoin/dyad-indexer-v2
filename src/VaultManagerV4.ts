@@ -24,6 +24,7 @@ async function getKerosene(context, id) {
       args: [id],
     });
   } catch (e) {
+    console.log("error", e);
     return 0n;
   }
 }
@@ -37,6 +38,7 @@ async function getDyad(context, id) {
       args: [id],
     });
   } catch (e) {
+    console.log("error", e);
     return 0n;
   }
 }
@@ -50,6 +52,7 @@ async function getXP(context, id) {
       args: [id],
     });
   } catch (e) {
+    console.log("error", e);
     return 0n;
   }
 }
@@ -65,7 +68,7 @@ async function updateNote(event, context) {
   const dyad = await getDyad(context, event.args.id);
   console.log("getting XP");
   const xp = await getXP(context, event.args.id);
-  console.log("upserting", event.args.id, cr, kerosene, dyad);
+  console.log("upserting", event.args.id, cr, kerosene, dyad, xp);
   await Note.upsert({
     id: event.args.id,
     create: {
