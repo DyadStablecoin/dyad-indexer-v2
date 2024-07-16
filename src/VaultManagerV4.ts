@@ -112,3 +112,16 @@ ponder.on("DNft:MintedInsiderNft", async ({ event, context }) => {
   console.log("Minted Insider Nft");
   createNft(context, event);
 });
+
+ponder.on("KeroseneVault:Deposit", async ({ event, context }) => {
+  console.log("Kerosene Deposit");
+  console.log("getting kerosene");
+  const xp = await getXP(context, event.args.id);
+  const { Note } = context.db;
+  await Note.update({
+    id: event.args.id,
+    data: {
+      xp: xp,
+    },
+  });
+});

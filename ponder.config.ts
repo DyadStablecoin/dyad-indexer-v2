@@ -7,6 +7,7 @@ import { VaultManagerV3_0x5c1aAbi } from "./abis/VaultManagerV3_0x5c1aAbi";
 import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
 
 import { DNftAbi } from "./abis/DNftAbi";
+import { VaultAbi } from "./abis/VaultAbi";
 
 // config
 export default createConfig({
@@ -34,6 +35,12 @@ export default createConfig({
       // startBlock: 20305389,
       // startBlock: 20200006,
       startBlock: 17733160,
+    },
+    KeroseneVault: {
+      abi: VaultAbi,
+      address: "0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43",
+      network: "mainnet",
+      startBlock: 20055920,
     },
   },
 });
