@@ -24,7 +24,7 @@ async function getKerosene(context, id) {
       args: [id],
     });
   } catch (e) {
-    console.log("error", e);
+    // console.log("error", e);
     return 0n;
   }
 }
@@ -38,15 +38,15 @@ async function getDyad(context, id) {
       args: [id],
     });
   } catch (e) {
-    console.log("error", e);
+    // console.log("error", e);
     return 0n;
   }
 }
 
 async function getXP(context, id, event) {
-  if (event.block.number < 20292276) {
-    return 0n;
-  }
+  // if (event.block.number < 20292276) {
+  //   return 0n;
+  // }
   try {
     return await context.client.readContract({
       abi: XpABI,
@@ -55,13 +55,12 @@ async function getXP(context, id, event) {
       args: [id],
     });
   } catch (e) {
-    console.log("error", e);
+    // console.log("error", e);
     return 0n;
   }
 }
 
 async function updateNote(event, context) {
-  console.log("event", event);
   const { Note } = context.db;
   console.log("getting cr");
   const cr = await getCr(context, event.args.id);
@@ -124,6 +123,50 @@ ponder.on("DNft:MintedNft", async ({ event, context }) => {
 ponder.on("DNft:MintedInsiderNft", async ({ event, context }) => {
   console.log("Minted Insider Nft");
   createNft(context, event);
+});
+
+ponder.on("DyadXP:Transfer", async ({ event, context }) => {
+  console.log("DyadXP Transfer");
+  const owner = event.args.to;
+
+  try {
+    const balanceOf = await context.client.readContract({
+      abi: DNftAbi,
+      address: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
+      functionName: "balanceOf",
+      args: [owner],
+    });
+    console.log("balanceOf", balanceOf);
+
+    // for (let i = 0; i < parseInt(balance); i++) {
+    for (let i = 0; i < balanceOf; i++) {
+      const nftID = await context.client.readContract({
+        abi: DNftAbi,
+        address: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
+        functionName: "tokenOfOwnerByIndex",
+        args: [owner, BigInt(i)],
+      });
+      console.log("nftID", nftID);
+
+      const { Note } = context.db;
+      const cr = await getCr(context, nftID);
+      const kerosene = await getKerosene(context, nftID);
+      const dyad = await getDyad(context, nftID);
+      const xp = await getXP(context, nftID, event);
+      console.log("DYAD XP transfer", nftID, cr, kerosene, dyad, xp);
+      await Note.update({
+        id: nftID,
+        data: {
+          collatRatio: cr,
+          kerosene: kerosene ?? 0,
+          dyad: dyad,
+          xp: xp,
+        },
+      });
+    }
+  } catch (e) {
+    // console.log("error", e);
+  }
 });
 
 ponder.on("KeroseneVault:Deposit", async ({ event, context }) => {
