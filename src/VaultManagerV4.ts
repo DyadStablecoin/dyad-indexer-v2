@@ -194,3 +194,29 @@ ponder.on("KeroseneVault:Withdraw", async ({ event, context }) => {
     },
   });
 });
+
+ponder.on("GetXP:block", async ({ event, context }) => {
+  const totalSupply = await context.client.readContract({
+    abi: DNftAbi,
+    address: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
+    functionName: "totalSupply",
+  });
+
+  for (let i = 0; i < totalSupply; i++) {
+    console.log("getting XP", i, totalSupply);
+
+    updateXP(context, event, i);
+  }
+});
+
+async function updateXP(context, event, i) {
+  console.log("updating xp");
+  const xp = await getXP(context, i, event);
+  const { Note } = context.db;
+  await Note.update({
+    id: BigInt(i),
+    data: {
+      xp: xp,
+    },
+  });
+}
