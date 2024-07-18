@@ -18,7 +18,7 @@ export default createConfig({
   blocks: {
     GetXP: {
       network: "mainnet",
-      startBlock: 20326203,
+      startBlock: 20330486 - 100,
       interval: 100, // every 100 blocks
     },
   },
