@@ -45,6 +45,12 @@ async function updateNote(context, id) {
         functionName: "balanceOfNote",
         args: [id],
       },
+      {
+        abi: VaultManagerAbi,
+        address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
+        functionName: "getTotalValue",
+        args: [id],
+      },
     ],
   });
 
@@ -52,8 +58,9 @@ async function updateNote(context, id) {
   const kerosene = results[1].result;
   const dyad = results[2].result;
   const xp = results[3].result;
+  const collateral = results[4].result;
 
-  console.log("updating note", id, collatRatio, kerosene, dyad, xp);
+  console.log("updating note", id, collatRatio, kerosene, dyad, xp, collateral);
 
   const { Note } = context.db;
   await Note.upsert({
@@ -63,6 +70,7 @@ async function updateNote(context, id) {
       kerosene: kerosene,
       dyad: dyad,
       xp: xp,
+      collateral: collateral,
     },
   });
 }

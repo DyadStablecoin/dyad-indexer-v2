@@ -7,5 +7,6 @@ export default createSchema((p) => ({
     kerosene: p.bigint().optional(),
     dyad: p.bigint().optional(),
     xp: p.bigint().optional(),
+    collateral: p.bigint().optional(),
   }),
 }));
