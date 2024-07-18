@@ -6,6 +6,7 @@ import { DNftAbi } from "../abis/DNftAbi";
 import { XpABI } from "../abis/XpAbi";
 
 ponder.on("GetXP:block", async ({ event, context }) => {
+  console.log("GetXP:block", event.block.number);
   const totalSupply = await context.client.readContract({
     abi: DNftAbi,
     address: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
@@ -47,7 +48,7 @@ async function updateNote(context, id) {
     ],
   });
 
-  console.log("updating note", results);
+  console.log("updating note", id, results);
 
   const { Note } = context.db;
   await Note.upsert({
