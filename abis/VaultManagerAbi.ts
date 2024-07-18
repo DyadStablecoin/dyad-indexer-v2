@@ -375,7 +375,7 @@ export const VaultManagerAbi = [
         type: "uint256",
       },
     ],
-    name: "getTotalUsdValue",
+    name: "getTotalValue",
     outputs: [
       {
         internalType: "uint256",

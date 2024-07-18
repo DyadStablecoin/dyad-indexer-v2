@@ -59,6 +59,14 @@ async function updateNote(context, id) {
   const dyad = results[2].result;
   const xp = results[3].result;
   const collateral = results[4].result;
+  console.log(
+    "results",
+    results[0].result,
+    results[1].result,
+    results[2].result,
+    results[3].result,
+    results[4].result
+  );
 
   console.log("updating note", id, collatRatio, kerosene, dyad, xp, collateral);
 
