@@ -48,16 +48,21 @@ async function updateNote(context, id) {
     ],
   });
 
-  console.log("updating note", id, results);
+  const collatRatio = results[0].result;
+  const kerosene = results[1].result;
+  const dyad = results[2].result;
+  const xp = results[3].result;
+
+  console.log("updating note", id, collatRatio, kerosene, dyad, xp);
 
   const { Note } = context.db;
   await Note.upsert({
     id: BigInt(id),
     update: {
-      collatRatio: results[0].result,
-      kerosene: results[1].result,
-      dyad: results[2].result,
-      xp: results[3].result,
+      collatRatio: collatRatio,
+      kerosene: kerosene,
+      dyad: dyad,
+      xp: xp,
     },
   });
 }
