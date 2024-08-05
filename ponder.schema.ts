@@ -8,5 +8,6 @@ export default createSchema((p) => ({
     dyad: p.bigint().optional(),
     xp: p.bigint().optional(),
     collateral: p.bigint().optional(),
+    lastLiquidation: p.bigint().optional(),
   }),
 }));
