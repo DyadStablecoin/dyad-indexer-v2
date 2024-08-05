@@ -25,6 +25,9 @@ ponder.on("VaultManagerV4:Liquidate", async ({ event, context }) => {
     create: {
       lastLiquidation: event.block.timestamp,
     },
+    update: {
+      lastLiquidation: event.block.timestamp,
+    },
   });
 });
 
