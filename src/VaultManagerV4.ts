@@ -18,6 +18,19 @@ ponder.on("GetXP:block", async ({ event, context }) => {
   }
 });
 
+ponder.on("VaultManagerV4:Liquidate", async ({ event, context }) => {
+  const { Note } = context.db;
+  await Note.upsert({
+    id: BigInt(event.args.id),
+    create: {
+      lastLiquidation: event.block.timestamp,
+    },
+    update: {
+      lastLiquidation: event.block.timestamp,
+    },
+  });
+});
+
 async function updateNote(context, id) {
   const results = await context.client.multicall({
     contracts: [

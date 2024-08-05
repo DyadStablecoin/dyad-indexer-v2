@@ -19,7 +19,7 @@ export default createConfig({
     GetXP: {
       network: "mainnet",
       // startBlock: 20330541,
-      startBlock: 20333058 - 100,
+      startBlock: 20461672 - 100,
       // interval: 1, // every 1 blocks
       interval: 100, // every 100 blocks
     },
@@ -34,16 +34,12 @@ export default createConfig({
       ]),
       address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
       network: "mainnet",
-      // startBlock: 20305389,
-      // startBlock: 20200006,
-      startBlock: 20013820,
+      startBlock: 20441603,
     },
     DNft: {
       abi: DNftAbi,
       address: "0xDc400bBe0B8B79C07A962EA99a642F5819e3b712",
       network: "mainnet",
-      // startBlock: 20305389,
-      // startBlock: 20200006,
       startBlock: 17733160,
     },
     KeroseneVault: {
