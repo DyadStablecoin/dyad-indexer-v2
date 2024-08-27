@@ -9,5 +9,12 @@ export default createSchema((p) => ({
     xp: p.bigint().optional(),
     collateral: p.bigint().optional(),
     lastLiquidation: p.bigint().optional(),
+    exoCollateral: p.bigint().optional(),
+  }),
+
+  Tvl: p.createTable({
+    id: p.bigint(),
+    tvl: p.bigint(),
+    timestamp: p.bigint(),
   }),
 }));

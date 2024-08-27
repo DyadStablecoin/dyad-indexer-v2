@@ -13,9 +13,22 @@ ponder.on("GetXP:block", async ({ event, context }) => {
     functionName: "totalSupply",
   });
 
+  let promises = [];
   for (let id = 0; id < totalSupply; id++) {
-    updateNote(context, id);
+    promises.push(updateNote(context, id));
   }
+  const allExoCollateral: bigint[] = await Promise.all(promises);
+
+  const totalExoCollateral = allExoCollateral.reduce((acc, val) => acc + val, BigInt(0));
+  const { Tvl } = context.db;
+  await Tvl.upsert({
+    id: event.block.number,
+    create: {
+      tvl: totalExoCollateral,
+      timestamp: event.block.timestamp,
+    },
+    update: {}
+  })
 });
 
 ponder.on("VaultManagerV4:Liquidate", async ({ event, context }) => {
@@ -61,7 +74,7 @@ async function updateNote(context, id) {
       {
         abi: VaultManagerAbi,
         address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
-        functionName: "getTotalValue",
+        functionName: "getVaultsValues",
         args: [id],
       },
     ],
@@ -71,14 +84,22 @@ async function updateNote(context, id) {
   const kerosene = results[1].result;
   const dyad = results[2].result;
   const xp = results[3].result;
-  const collateral = results[4].result;
+
+  let exoCollateral = BigInt(0);
+  let collateral = BigInt(0);
+  
+  if (results[4].result) {
+    exoCollateral = results[4].result[0];
+    collateral = exoCollateral + results[4].result[1];
+  }
+
   console.log(
     "results",
     results[0].result,
     results[1].result,
     results[2].result,
     results[3].result,
-    results[4].result
+    collateral
   );
 
   console.log("updating note", id, collatRatio, kerosene, dyad, xp, collateral);
@@ -92,6 +113,10 @@ async function updateNote(context, id) {
       dyad: dyad,
       xp: xp,
       collateral: collateral,
+      exoCollateral
     },
   });
+
+  // return the exo collateral value
+  return exoCollateral
 }
