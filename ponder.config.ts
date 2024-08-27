@@ -21,7 +21,7 @@ export default createConfig({
       // startBlock: 20330541,
       startBlock: 20620295 - 100,
       // interval: 1, // every 1 blocks
-      interval: 1, // every 100 blocks
+      interval: 100, // every 100 blocks
     },
   },
   contracts: {
