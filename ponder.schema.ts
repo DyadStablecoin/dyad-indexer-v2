@@ -10,4 +10,12 @@ export default createSchema((p) => ({
     collateral: p.bigint().optional(),
     lastLiquidation: p.bigint().optional(),
   }),
+
+  Protocol: p.createTable({
+    id: p.string(),
+    tvl: p.bigint().optional(),
+    totalNotes: p.bigint().optional(),
+    totalDyad: p.bigint().optional(),
+    lastUpdated: p.bigint().optional(),
+  }),
 }));
