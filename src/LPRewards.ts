@@ -1,18 +1,14 @@
 import { ponder } from "@/generated";
 import { encodeAbiParameters, keccak256, zeroAddress } from "viem";
+import config from "../ponder.config";
 
 ponder.on("CalculateLPReward:block", async ({ event, context }) => {
   console.log("CalculateLPReward:block", event.block.number);
 
 //  console.log('context', JSON.stringify(context, null, 2));
 
-  const { Staking, DyadXP, DNft } = context.contracts;
   const { NoteLiquidity, Liquidity } = context.db;
 
-  console.log('context', context);
-  console.log('Staking', Staking);
-  console.log('DyadXP', DyadXP);
-  console.log('DNft', DNft);
 
   const client = context.client;
 
@@ -24,13 +20,13 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
       //   functionName: "totalLP",
       // },
       {
-        abi: DyadXP.abi,
-        address: DyadXP.address,
+        abi: config.contracts.DyadXP.abi,
+        address: config.contracts.DyadXP.address,
         functionName: "totalSupply",
       },
       {
-        abi: DNft.abi,
-        address: DNft.address,
+        abi: config.contracts.DNft.abi,
+        address: config.contracts.DNft.address,
         functionName: "totalSupply",
       },
       // {
@@ -53,15 +49,15 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
   ] = results;
 
   const depositedCalls = Array.from({ length: Number(totalNft) }).map((_, i) => ({
-    abi: Staking.abi,
-    address: Staking.address,
+    abi: config.contracts.Staking.abi,
+    address: config.contracts.Staking.address,
     functionName: "noteIdToAmountDeposited",
     args: [BigInt(i)],
   }));
 
   const xpCalls = Array.from({ length: Number(totalNft) }).map((_, i) => ({
-    abi: DyadXP.abi,
-    address: DyadXP.address,
+    abi: config.contracts.DyadXP.abi,
+    address: config.contracts.DyadXP.address,
     functionName: "balanceOfNote",
     args: [BigInt(i)],
   }));
