@@ -9,6 +9,7 @@ import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
 import { DNftAbi } from "./abis/DNftAbi";
 import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
+import { StakingAbi } from "./abis/StakingAbi";
 
 // config
 export default createConfig({

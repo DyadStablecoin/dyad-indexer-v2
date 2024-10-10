@@ -1,11 +1,11 @@
 import { ponder } from "@/generated";
-import { formatEther } from "viem";
+import { encodeAbiParameters, keccak256 } from "viem";
 
 ponder.on("CalculateLPReward:block", async ({ event, context }) => {
   console.log("CalculateLPReward:block", event.block.number);
 
   const { Staking, DyadXP, DNft } = context.contracts;
-  const { TotalLiquidity, Liquidity } = context.db;
+  const { NoteLiquidity, Liquidity } = context.db;
 
   const client = context.client;
 
@@ -26,25 +26,16 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
         address: DNft.address,
         functionName: "totalSupply",
       },
+      {
+        abi: Staking.abi,
+        address: Staking.address,
+        functionName: "lpToken",
+      },
     ],
     allowFailure: false,
   });
 
-  const [totalLiquidity, totalXp, totalNft] = results;
-
-  await TotalLiquidity.upsert({
-    id: event.block.number,
-    create: {
-      totalLiquidity,
-      totalXp,
-      timestamp: event.block.timestamp,
-    },
-    update: {
-      totalLiquidity,
-      totalXp,
-      timestamp: event.block.timestamp,
-    }
-  });
+  const [totalLiquidity, totalXp, totalNft, lpToken] = results;
 
   const depositedCalls = Array.from({ length: Number(totalNft) }).map((_, i) => ({
     abi: Staking.abi,
@@ -70,28 +61,50 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
     allowFailure: false,
   });
 
-  const promises = depositedResults.map((result, i) => {
-    const [deposited] = result;
-    const noteId = BigInt(i);
-
-    return Liquidity.upsert({
-      id: event.block.number,
-      create: {
-        noteId,
-        liquidity: deposited,
-        liquidityPercentage: format(deposited) / format(totalLiquidity),
-        xp: xpResults[i] as bigint,
-        xpPercentage: format(xpResults[i] as bigint) / format(totalXp),
-        timestamp: event.block.timestamp,
-      },
-    });
+  await Liquidity.upsert({
+    id: event.block.number,
+    create: {
+      totalLiquidity,
+      totalXp,
+      timestamp: event.block.timestamp,
+    },
+    update: {
+      totalLiquidity,
+      totalXp,
+      timestamp: event.block.timestamp,
+    },
   });
 
-  await Promise.all(promises);
+  const noteLiquidity = depositedResults.map((result, i) => {
+    const liquidity = result as bigint;
+    const noteId = BigInt(i);
+    const xp = xpResults[i] as bigint;
+    const recordId = keccak256(encodeAbiParameters([
+        { type: "uint256" },
+        { type: "uint256" },
+        { type: "address" }
+      ], [noteId, event.block.number, lpToken]));
+  
+      return NoteLiquidity.upsert({
+        id: recordId,
+        create: {
+          noteId,
+          liquidity,
+          xp,
+          timestamp: event.block.timestamp,
+          blockNumber: event.block.number,
+          pool: lpToken,
+        },
+        update: {
+          noteId,
+          liquidity,
+          xp,
+          timestamp: event.block.timestamp,
+          blockNumber: event.block.number,
+          pool: lpToken,
+        },
+      })
+    })
 
+  await Promise.all(noteLiquidity);
 });
-
-
-function format(value: bigint) {
-    return Number(formatEther(value))
-}

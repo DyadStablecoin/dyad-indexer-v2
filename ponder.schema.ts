@@ -18,20 +18,21 @@ export default createSchema((p) => ({
     timestamp: p.bigint(),
   }),
 
-  TotalLiquidity: p.createTable({
-    id: p.bigint(),
-    totalLiquidity: p.bigint(),
-    totalXp: p.bigint(),
+  NoteLiquidity: p.createTable({
+    id: p.string(),
+    pool: p.string(),
+    noteId: p.bigint(),
+    blockNumber: p.bigint().references("Liquidity.id"),
+    liquidity: p.bigint(),
+    xp: p.bigint(),
     timestamp: p.bigint(),
   }),
 
   Liquidity: p.createTable({
     id: p.bigint(),
-    noteId: p.bigint(),
-    liquidity: p.bigint(),
-    liquidityPercentage: p.float(),
-    xp: p.bigint(),
-    xpPercentage: p.float(),
+    totalLiquidity: p.bigint(),
+    totalXp: p.bigint(),
     timestamp: p.bigint(),
-  }),
+    notes: p.many("NoteLiquidity.blockNumber")
+  })
 }));
