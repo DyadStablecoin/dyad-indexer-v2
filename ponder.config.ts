@@ -23,8 +23,19 @@ export default createConfig({
       // interval: 1, // every 1 blocks
       interval: 100, // every 100 blocks
     },
+    CalculateLPReward: {
+      network: "mainnet",
+      startBlock: 20620295,
+      interval: 5, // every 5 blocks
+    }
   },
   contracts: {
+    Staking: {
+      abi: StakingAbi,
+      address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
+      network: "mainnet",
+      startBlock: 20620295,
+    },
     VaultManagerV4: {
       abi: mergeAbis([
         ERC1967ProxyAbi,

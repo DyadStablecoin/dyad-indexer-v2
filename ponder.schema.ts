@@ -17,4 +17,21 @@ export default createSchema((p) => ({
     tvl: p.bigint(),
     timestamp: p.bigint(),
   }),
+
+  TotalLiquidity: p.createTable({
+    id: p.bigint(),
+    totalLiquidity: p.bigint(),
+    totalXp: p.bigint(),
+    timestamp: p.bigint(),
+  }),
+
+  Liquidity: p.createTable({
+    id: p.bigint(),
+    noteId: p.bigint(),
+    liquidity: p.bigint(),
+    liquidityPercentage: p.float(),
+    xp: p.bigint(),
+    xpPercentage: p.float(),
+    timestamp: p.bigint(),
+  }),
 }));
