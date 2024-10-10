@@ -1,21 +1,28 @@
 import { ponder } from "@/generated";
-import { encodeAbiParameters, keccak256 } from "viem";
+import { encodeAbiParameters, keccak256, zeroAddress } from "viem";
 
 ponder.on("CalculateLPReward:block", async ({ event, context }) => {
   console.log("CalculateLPReward:block", event.block.number);
 
+//  console.log('context', JSON.stringify(context, null, 2));
+
   const { Staking, DyadXP, DNft } = context.contracts;
   const { NoteLiquidity, Liquidity } = context.db;
+
+  console.log('context', context);
+  console.log('Staking', Staking);
+  console.log('DyadXP', DyadXP);
+  console.log('DNft', DNft);
 
   const client = context.client;
 
   const results = await client.multicall({
     contracts: [
-      {
-        abi: Staking.abi,
-        address: Staking.address,
-        functionName: "totalLP",
-      },
+      // {
+      //   abi: Staking.abi,
+      //   address: Staking.address,
+      //   functionName: "totalLP",
+      // },
       {
         abi: DyadXP.abi,
         address: DyadXP.address,
@@ -26,16 +33,24 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
         address: DNft.address,
         functionName: "totalSupply",
       },
-      {
-        abi: Staking.abi,
-        address: Staking.address,
-        functionName: "lpToken",
-      },
+      // {
+      //   abi: Staking.abi,
+      //   address: Staking.address,
+      //   functionName: "lpToken",
+      // },
     ],
     allowFailure: false,
   });
 
-  const [totalLiquidity, totalXp, totalNft, lpToken] = results;
+  const totalLiquidity = 0n;
+  const lpToken = zeroAddress;
+
+  const [
+    //totalLiquidity, 
+    totalXp, 
+    totalNft, 
+    //lpToken
+  ] = results;
 
   const depositedCalls = Array.from({ length: Number(totalNft) }).map((_, i) => ({
     abi: Staking.abi,
@@ -51,10 +66,11 @@ ponder.on("CalculateLPReward:block", async ({ event, context }) => {
     args: [BigInt(i)],
   }));
 
-  const depositedResults = await client.multicall({
-    contracts: depositedCalls,
-    allowFailure: false,
-  });
+  const depositedResults = Array.from({ length: Number(totalNft) }).map((_, i) => 0n);
+  // const depositedResults = await client.multicall({
+  //   contracts: depositedCalls,
+  //   allowFailure: false,
+  // });
 
   const xpResults = await client.multicall({
     contracts: xpCalls,
