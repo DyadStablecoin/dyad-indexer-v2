@@ -25,10 +25,15 @@ export default createConfig({
       // interval: 1, // every 1 blocks
       interval: 100, // every 100 blocks
     },
-    CalculateLPReward: {
+    IndexLPBalances: {
       network: "mainnet",
       startBlock,
       interval: 5, // every 5 blocks
+    },
+    SetRoot: {
+      network: "mainnet",
+      startBlock,
+      interval: 1200, // every 1200 blocks
     }
   },
   contracts: {

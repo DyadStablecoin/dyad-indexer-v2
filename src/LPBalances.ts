@@ -2,8 +2,8 @@ import { ponder } from "@/generated";
 import { encodeAbiParameters, keccak256, zeroAddress } from "viem";
 import config from "../ponder.config";
 
-ponder.on("CalculateLPReward:block", async ({ event, context }) => {
-  console.log("CalculateLPReward:block", event.block.number);
+ponder.on("IndexLPBalances:block", async ({ event, context }) => {
+  console.log("IndexLPBalances:block", event.block.number);
 
 //  console.log('context', JSON.stringify(context, null, 2));
 
