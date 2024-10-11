@@ -5,10 +5,12 @@ import { ERC1967ProxyAbi } from "./abis/ERC1967ProxyAbi";
 import { VaultManagerV2_0x1342Abi } from "./abis/VaultManagerV2_0x1342Abi";
 import { VaultManagerV3_0x5c1aAbi } from "./abis/VaultManagerV3_0x5c1aAbi";
 import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
+import { VaultManagerV5_0xabc0Abi } from "./abis/VaultManagerV5_0xabc0Abi";
 
 import { DNftAbi } from "./abis/DNftAbi";
 import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
+
 
 // config
 export default createConfig({
@@ -31,6 +33,7 @@ export default createConfig({
         VaultManagerV2_0x1342Abi,
         VaultManagerV3_0x5c1aAbi,
         VaultManagerV4_0x2592Abi,
+        VaultManagerV5_0xabc0Abi
       ]),
       address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
       network: "mainnet",
