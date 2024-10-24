@@ -12,7 +12,7 @@ import { XpABI } from "./abis/XpAbi";
 import { LPStakingAbi } from "./abis/LPStaking";
 import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
 
-const startBlock = 20937623;
+const startBlock = 20946158
 // config
 export default createConfig({
   networks: {
