@@ -28,21 +28,21 @@ export default createConfig({
     },
     IndexLPBalances: {
       network: "mainnet",
-      startBlock,
+      startBlock: 21031003,
       interval: 5, // every 5 blocks
     },
-    SetRoot: {
-      network: "mainnet",
-      startBlock,
-      interval: 1200, // every 1200 blocks
-    }
+    // SetRoot: {
+    //   network: "mainnet",
+    //   startBlock: 21031003,
+    //   interval: 1200, // every 1200 blocks
+    // }
   },
   contracts: {
     LPStakingFactory: {
       abi: LPStakingFactoryAbi,
       address: "0xD19DCbB8B82805d779a6A2182d8F4355275CC30a",
       network: "mainnet",
-      startBlock,
+      startBlock: 21031003,
     },
     Staking: {
       abi: LPStakingAbi,
@@ -52,7 +52,7 @@ export default createConfig({
         event: parseAbiItem("event PoolStakingCreated(address indexed lpToken, address indexed staking)"),
         parameter: "staking"
       },
-      startBlock,
+      startBlock: 21031003,
     },
     VaultManagerV4: {
       abi: mergeAbis([
