@@ -1,5 +1,5 @@
 import { createConfig, mergeAbis } from "@ponder/core";
-import { http } from "viem";
+import { http, parseAbiItem } from "viem";
 
 import { ERC1967ProxyAbi } from "./abis/ERC1967ProxyAbi";
 import { VaultManagerV2_0x1342Abi } from "./abis/VaultManagerV2_0x1342Abi";
@@ -9,6 +9,8 @@ import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
 import { DNftAbi } from "./abis/DNftAbi";
 import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
+import { LPStakingAbi } from "./abis/LPStaking";
+import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
 
 const startBlock = 20946158
 // config
@@ -24,8 +26,34 @@ export default createConfig({
       // interval: 1, // every 1 blocks
       interval: 100, // every 100 blocks
     },
+    IndexLPBalances: {
+      network: "mainnet",
+      startBlock: 21031003,
+      interval: 5, // every 5 blocks
+    },
+    // SetRoot: {
+    //   network: "mainnet",
+    //   startBlock: 21031003,
+    //   interval: 1200, // every 1200 blocks
+    // }
   },
   contracts: {
+    LPStakingFactory: {
+      abi: LPStakingFactoryAbi,
+      address: "0xD19DCbB8B82805d779a6A2182d8F4355275CC30a",
+      network: "mainnet",
+      startBlock: 21031003,
+    },
+    Staking: {
+      abi: LPStakingAbi,
+      network: "mainnet",
+      factory: {
+        address: "0xD19DCbB8B82805d779a6A2182d8F4355275CC30a",
+        event: parseAbiItem("event PoolStakingCreated(address indexed lpToken, address indexed staking)"),
+        parameter: "staking"
+      },
+      startBlock: 21031003,
+    },
     VaultManagerV4: {
       abi: mergeAbis([
         ERC1967ProxyAbi,
