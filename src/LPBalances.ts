@@ -84,6 +84,32 @@ ponder.on("IndexLPBalances:block", async ({ event, context }) => {
       totalNft,
     ] = results;
 
+    const liquidityId = keccak256(encodeAbiParameters([
+      { type: "address" },
+      { type: "uint256" },
+    ], [pool.id as Address, event.block.number]));
+
+    if (totalLiquidity === 0n) {
+      await Liquidity.upsert({
+        id: liquidityId,
+        create: {
+          blockNumber: event.block.number,
+          pool: pool.id,
+          totalLiquidity,
+          totalXp,
+          timestamp: event.block.timestamp,
+        },
+        update: {
+          blockNumber: event.block.number,
+          pool: pool.id,
+          totalLiquidity,
+          totalXp,
+          timestamp: event.block.timestamp,
+        },
+      });
+      return;
+    }
+
     const depositedCalls = Array.from({ length: Number(totalNft) }).map((_, i) => ({
       abi: config.contracts.Staking.abi,
       address: pool.id as Address,
@@ -109,11 +135,6 @@ ponder.on("IndexLPBalances:block", async ({ event, context }) => {
       allowFailure: false,
     });
 
-    const liquidityId = keccak256(encodeAbiParameters([
-      { type: "address" },
-      { type: "uint256" },
-    ], [pool.id as Address, event.block.number]));
-
     await Liquidity.upsert({
       id: liquidityId,
       create: {
@@ -134,6 +155,9 @@ ponder.on("IndexLPBalances:block", async ({ event, context }) => {
 
     const noteLiquidity = depositedResults.map((result, i) => {
       const liquidity = result as bigint;
+      if (liquidity === 0n) {
+        return Promise.resolve();
+      }
       const noteId = BigInt(i);
       const xp = xpResults[i] as bigint;
       const recordId = keccak256(encodeAbiParameters([
