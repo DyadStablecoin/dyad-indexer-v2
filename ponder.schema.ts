@@ -27,6 +27,9 @@ export default createSchema((p) => ({
     liquidity: p.bigint(),
     xp: p.bigint(),
     timestamp: p.bigint(),
+  }, {
+    blockNumberIndex: p.index(["liquidityId", "blockNumber"]),
+    poolIndex: p.index(["pool"])
   }),
 
   Liquidity: p.createTable({
@@ -37,11 +40,25 @@ export default createSchema((p) => ({
     totalXp: p.bigint(),
     timestamp: p.bigint(),
     notes: p.many("NoteLiquidity.liquidityId")
+  }, {
+    blockNumberIndex: p.index(["pool","blockNumber"])
   }),
 
   Pool: p.createTable({
     id: p.string(),
     lpToken: p.string(),
-    liquidity: p.many("Liquidity.pool")
+    liquidity: p.many("Liquidity.pool"),
+    rewardRates: p.many("RewardRate.pool"),
+  }),
+
+  RewardRate: p.createTable({
+    id: p.string(), // keccak256(abi.encode(pool.id, blockNumber))
+    pool: p.string().references("Pool.id"),
+    blockNumber: p.bigint(),
+    rate: p.bigint(),
+    timestamp: p.bigint(),
+  }, {
+    blockNumberIndex: p.index(["pool","blockNumber"]),
+    poolIndex: p.index(["pool"])
   }),
 }));

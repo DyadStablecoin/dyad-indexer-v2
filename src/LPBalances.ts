@@ -5,12 +5,44 @@ import config from "../ponder.config";
 ponder.on("LPStakingFactory:PoolStakingCreated", async ({ event, context }) => {
   console.log("LPStakingFactory:PoolStakingCreated", event.args.staking);
 
-  const { Pool } = context.db;
+  const { Pool, RewardRate } = context.db;
 
   await Pool.create({
     id: event.args.staking,
     data: {
       lpToken: event.args.lpToken,
+    }
+  });
+
+  await RewardRate.create({
+    id: keccak256(encodeAbiParameters([
+      { type: "address" },
+      { type: "uint256" },
+    ], [event.args.staking, event.block.number])),
+    data: {
+      pool: event.args.staking,
+      blockNumber: event.block.number,
+      timestamp: event.block.timestamp,
+      rate: 0n
+    }
+  });
+});
+
+ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
+  console.log("LPStakingFactory:RewardRateSet", event.args.lpToken, event.args.newRewardRate);
+
+  const { RewardRate } = context.db;
+
+  await RewardRate.create({
+    id: keccak256(encodeAbiParameters([
+      { type: "address" },
+      { type: "uint256" },
+    ], [event.args.lpToken, event.block.number])),
+    data: {
+      pool: event.args.lpToken,
+      blockNumber: event.block.number,
+      timestamp: event.block.timestamp,
+      rate: event.args.newRewardRate,
     }
   });
 });

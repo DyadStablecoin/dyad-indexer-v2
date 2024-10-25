@@ -1,9 +1,10 @@
-import { ponder } from "@/generated";
+import { Context, ponder } from "@/generated";
 import { VaultAbi } from "../abis/VaultAbi";
 import { DyadAbi } from "../abis/DyadAbi";
 import { DNftAbi } from "../abis/DNftAbi";
 import { XpABI } from "../abis/XpAbi";
 import { VaultManagerV4_0x2592Abi } from "../abis/VaultManagerV4_0x2592Abi";
+import { formatEther } from "viem";
 
 ponder.on("GetXP:block", async ({ event, context }) => {
   console.log("GetXP:block", event.block.number);
@@ -13,13 +14,17 @@ ponder.on("GetXP:block", async ({ event, context }) => {
     functionName: "totalSupply",
   });
 
+  console.log(`Updating ${totalSupply} notes XP for block ${event.block.number}`);
   let promises = [];
   for (let id = 0; id < totalSupply; id++) {
-    promises.push(updateNote(context, id));
+    promises.push(updateNote(context, BigInt(id)));
   }
   const allExoCollateral: bigint[] = await Promise.all(promises);
 
   const totalExoCollateral = allExoCollateral.reduce((acc, val) => acc + val, BigInt(0));
+
+  console.log(`Done updating ${totalSupply} notes for block ${event.block.number}. ${formatEther(totalExoCollateral)} TVL.`);
+
   const { Tvl } = context.db;
   await Tvl.upsert({
     id: event.block.number,
@@ -47,7 +52,7 @@ ponder.on("VaultManagerV4:Liquidate", async ({ event, context }) => {
   });
 });
 
-async function updateNote(context, id: bigint) {
+async function updateNote(context: Context, id: bigint) {
   const results = await context.client.multicall({
     contracts: [
       {
@@ -95,17 +100,6 @@ async function updateNote(context, id: bigint) {
     exoCollateral = results[4].result[0];
     collateral = exoCollateral + results[4].result[1];
   }
-
-  // console.log(
-  //   "results",
-  //   results[0].result,
-  //   results[1].result,
-  //   results[2].result,
-  //   results[3].result,
-  //   collateral
-  // );
-
-  console.log("updating note", id, collatRatio, kerosene, dyad, xp, collateral);
 
   const { Note } = context.db;
   await Note.upsert({
