@@ -31,7 +31,18 @@ ponder.on("LPStakingFactory:PoolStakingCreated", async ({ event, context }) => {
 ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
   console.log("LPStakingFactory:RewardRateSet", event.args.lpToken, event.args.newRewardRate);
 
-  const { RewardRate } = context.db;
+  const { RewardRate, Pool } = context.db;
+
+  const pools = await Pool.findMany({
+    limit: 1,
+    where: {
+      lpToken: event.args.lpToken,
+    }
+  });
+
+  if (pools.items.length !== 1) {
+    return;
+  }
 
   await RewardRate.create({
     id: keccak256(encodeAbiParameters([
@@ -39,7 +50,7 @@ ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
       { type: "uint256" },
     ], [event.args.lpToken, event.block.number])),
     data: {
-      pool: event.args.lpToken,
+      pool: pools.items[0]!.id,
       blockNumber: event.block.number,
       timestamp: event.block.timestamp,
       rate: event.args.newRewardRate,
