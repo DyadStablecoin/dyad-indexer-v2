@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ponder/core": "^0.4.42",
+    "merkletreejs": "^0.4.0",
     "viem": "^1.19.3"
   },
   "devDependencies": {
