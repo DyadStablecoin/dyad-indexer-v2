@@ -1,6 +1,6 @@
 import { Context, ponder } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, encodeAbiParameters, encodePacked, formatEther, formatUnits, keccak256 } from "viem";
+import { Address, encodeAbiParameters, encodePacked, formatEther, formatUnits, keccak256, parseEther } from "viem";
 import MerkleTree from "merkletreejs";
 
 const XP_TANH_FACTOR = 8;
@@ -58,10 +58,10 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
                         { type: "uint256" },
                     ], [BigInt(noteId), pool.id as Address, thisFromBlock, lastToBlock])),
                     noteId: BigInt(noteId),
-                    amount: BigInt(rewards),
+                    amount: rewards,
                     pool: pool.id,
-                    fromBlockNumber: BigInt(thisFromBlock),
-                    toBlockNumber: BigInt(lastToBlock),
+                    fromBlockNumber: thisFromBlock,
+                    toBlockNumber: lastToBlock,
                     timestamp: event.block.timestamp,
                 }))
             })
@@ -122,9 +122,17 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
         });
     }
 
-    const allRewards = await TotalReward.findMany();
+    let cursor: string | undefined = undefined;
+    let hasNextPage = false;
+    const allRewards: any[] = [];
+    do {
+        const rewards = await TotalReward.findMany({ after: cursor });
+        allRewards.push(...rewards.items);
+        hasNextPage = rewards.pageInfo.hasNextPage;
+        cursor = rewards.pageInfo.endCursor ?? undefined;
+    } while (hasNextPage)
 
-    const leaves = allRewards.items.map((reward) => {
+    const leaves = allRewards.map((reward) => {
         const packed = encodePacked(["uint256", "uint256"], [reward.id, reward.amount]);
         return keccak256(packed);
     });
@@ -137,39 +145,58 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
 async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
     const { Liquidity, NoteLiquidity } = context.db;
 
-    const liquidity = await Liquidity.findMany({
-        where: {
-            pool: pool,
-            blockNumber: {
-                gte: fromBlock,
-                lt: toBlock
+    const liquidityItems = [];
+
+    let cursor: string | undefined = undefined;
+    let hasNextPage = false;
+    do {
+        const liquidity = await Liquidity.findMany({
+            after: cursor,
+            where: {
+                pool: pool,
+                blockNumber: {
+                    gte: fromBlock,
+                    lt: toBlock
+                }
             }
-        }
-    });
-    const totalSnapshotsInPeriod = liquidity.items.length;
+        });
+        liquidityItems.push(...liquidity.items);
+        hasNextPage = liquidity.pageInfo.hasNextPage;
+        cursor = liquidity.pageInfo.endCursor ?? undefined;
+    } while (hasNextPage)
+    const totalSnapshotsInPeriod = liquidityItems.length;
 
     if (totalSnapshotsInPeriod === 0) {
         return {};
     }
 
-    const noteLiquidity = await NoteLiquidity.findMany({
-        where: {
-            pool: pool,
-            blockNumber: {
-                gte: fromBlock,
-                lt: toBlock
-            },
-            liquidity: {
-                gt: 0n
+    const noteLiquidityItems: any[] = [];
+    cursor = undefined;
+    hasNextPage = false;
+    do {
+        const noteLiquidity = await NoteLiquidity.findMany({
+            after: cursor,
+            where: {
+                pool: pool,
+                blockNumber: {
+                    gte: fromBlock,
+                    lt: toBlock
+                },
+                liquidity: {
+                    gt: 0n
+                }
             }
-        }
-    });
+        });
+        noteLiquidityItems.push(...noteLiquidity.items);
+        hasNextPage = noteLiquidity.pageInfo.hasNextPage;
+        cursor = noteLiquidity.pageInfo.endCursor ?? undefined;
+    } while (hasNextPage)
 
     let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
     let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
 
-    for (const note of noteLiquidity.items) {
+    for (const note of noteLiquidityItems) {
         const noteId = Number(note.noteId);
         totalLiquidityInPeriod += note.liquidity;
         totalXpInPeriod += note.xp;
@@ -198,13 +225,14 @@ async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBl
         scaledSizeByNoteId[Number(noteId)] = boostedSize;
     }
 
-    const totalRewardsForPeriod = Number(formatEther(rewardRate * BigInt(BLOCK_TIME) * (fromBlock - toBlock)));
+    const totalRewardsForPeriod = Number(formatEther(rewardRate * BigInt(BLOCK_TIME) * (toBlock - fromBlock)));
 
-    let rewardsByNoteId: Record<number, number> = {};
+    const rewardsByNoteId: Record<number, bigint> = {};
 
     for (const [noteId, scaledSize] of Object.entries(scaledSizeByNoteId)) {
         const shareOfTotal = scaledSize / totalSize;
-        const rewardsForNote = totalRewardsForPeriod * shareOfTotal;
+        const rewardsForNote = parseEther((totalRewardsForPeriod * shareOfTotal).toFixed(18));
+
         rewardsByNoteId[Number(noteId)] = rewardsForNote;
     }
 
