@@ -141,7 +141,10 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     let hasNextPage = false;
     const allRewards: any[] = [];
     do {
-        const rewards = await TotalReward.findMany({ after: cursor });
+        const rewards = await TotalReward.findMany({ 
+            after: cursor,
+            limit: 1000 
+        });
         allRewards.push(...rewards.items);
         hasNextPage = rewards.pageInfo.hasNextPage;
         cursor = rewards.pageInfo.endCursor ?? undefined;
@@ -166,6 +169,7 @@ async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBl
     let hasNextPage = false;
     do {
         const liquidity = await Liquidity.findMany({
+            limit: 1000,
             after: cursor,
             where: {
                 pool: pool,
@@ -190,6 +194,7 @@ async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBl
     hasNextPage = false;
     do {
         const noteLiquidity = await NoteLiquidity.findMany({
+            limit: 1000,
             after: cursor,
             where: {
                 pool: pool,
