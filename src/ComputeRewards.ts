@@ -1,8 +1,9 @@
 import { Context, ponder } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, encodeAbiParameters, encodeFunctionData, encodePacked, formatEther, formatUnits, Hex, keccak256, parseEther } from "viem";
+import { Address, createPublicClient, encodeAbiParameters, encodePacked, formatEther, formatUnits, Hex, keccak256, parseEther } from "viem";
 import MerkleTree from "merkletreejs";
 import { Defender } from "@openzeppelin/defender-sdk";
+import { mainnet } from "viem/chains";
 
 const XP_TANH_FACTOR = 8;
 const LP_TANH_FACTOR = 3;
@@ -79,7 +80,13 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
 
     console.log("Root", root);
 
-    const lastOnchainUpdateBlock = await context.client.readContract({
+    // create public client to mainnet for reading the latest block
+    const latestClient = createPublicClient({
+        chain: mainnet,
+        transport: ponderConfig.networks.mainnet.transport
+    });
+
+    const lastOnchainUpdateBlock = await latestClient.readContract({
         abi: ponderConfig.contracts.LPStakingFactory.abi,
         address: ponderConfig.contracts.LPStakingFactory.address,
         functionName: "lastUpdateBlock"
@@ -111,6 +118,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
         abi: ponderConfig.contracts.DNft.abi,
         address: ponderConfig.contracts.DNft.address,
         functionName: "totalSupply",
+        blockNumber
     });
 
     for (let i = 0; i < dnftSupply; i++) {
