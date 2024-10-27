@@ -1,7 +1,8 @@
 import { Context, ponder } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, encodeAbiParameters, encodePacked, formatEther, formatUnits, keccak256, parseEther } from "viem";
+import { Address, encodeAbiParameters, encodeFunctionData, encodePacked, formatEther, formatUnits, Hex, keccak256, parseEther } from "viem";
 import MerkleTree from "merkletreejs";
+import { Defender } from "@openzeppelin/defender-sdk";
 
 const XP_TANH_FACTOR = 8;
 const LP_TANH_FACTOR = 3;
@@ -78,7 +79,21 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
 
     console.log("Root", root);
 
-    // TODO: Update the root onchain
+
+    const defender = new Defender({
+        apiKey: process.env.RELAY_API_KEY,
+        apiSecret: process.env.RELAY_API_SECRET,
+    });
+
+    // await defender.relaySigner.sendTransaction({
+    //     to: ponderConfig.contracts.LPStakingFactory.address,
+    //     data: encodeFunctionData({
+    //         abi: ponderConfig.contracts.LPStakingFactory.abi,
+    //         functionName: "setRoot",
+    //         args: [root as Hex, event.block.number]
+    //     }),
+    //     gasLimit: 100_000
+    // })
 });
 
 async function computeTotalRewards(blockNumber: bigint, context: Context) {
