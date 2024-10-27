@@ -11,6 +11,7 @@ import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
 import { LPStakingAbi } from "./abis/LPStaking";
 import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
+import { DyadAbi } from "./abis/DyadAbi";
 
 const startBlock = 21038945
 // config
@@ -31,6 +32,11 @@ export default createConfig({
       startBlock: 21031003,
       interval: 5, // every 5 blocks
     },
+    ComputeRewards: {
+      network: "mainnet",
+      startBlock: 21031003,
+      interval: 1800, // every 6 hours
+    }
     // SetRoot: {
     //   network: "mainnet",
     //   startBlock: 21031003,

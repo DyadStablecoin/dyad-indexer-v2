@@ -61,4 +61,20 @@ export default createSchema((p) => ({
     blockNumberIndex: p.index(["pool","blockNumber"]),
     poolIndex: p.index(["pool"])
   }),
+
+  Reward: p.createTable({
+    id: p.string(), // keccak256(abi.encode(noteId, pool.id, fromBlockNumber, toBlockNumber))
+    pool: p.string().references("Pool.id"),
+    fromBlockNumber: p.bigint(),
+    toBlockNumber: p.bigint(),
+    noteId: p.bigint(),
+    amount: p.bigint(),
+    timestamp: p.bigint(),
+  }),
+
+  TotalReward: p.createTable({
+    id: p.bigint(), // note id
+    amount: p.bigint(),
+    lastUpdated: p.bigint(), // block number
+  }),
 }));
