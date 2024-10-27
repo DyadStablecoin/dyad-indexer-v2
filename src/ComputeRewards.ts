@@ -1,9 +1,9 @@
 import { Context, ponder } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, encodePacked, formatEther, formatUnits, Hex, keccak256, parseEther } from "viem";
-import MerkleTree from "merkletreejs";
+import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
+import { buildMerkleTree } from "./buildMerkleTree";
 
 const XP_TANH_FACTOR = 8;
 const LP_TANH_FACTOR = 3;
@@ -165,13 +165,8 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
         cursor = rewards.pageInfo.endCursor ?? undefined;
     } while (hasNextPage)
 
-    const leaves = allRewards.map((reward) => {
-        const packed = encodePacked(["uint256", "uint256"], [reward.id, reward.amount]);
-        return keccak256(packed);
-    });
 
-    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-
+    const tree = buildMerkleTree(allRewards);
     return tree.getHexRoot();
 }
 

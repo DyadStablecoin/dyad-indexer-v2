@@ -12,14 +12,15 @@
   },
   "dependencies": {
     "@openzeppelin/defender-sdk": "^1.15.0",
-    "@ponder/core": "^0.4.42",
+    "@ponder/core": "^0.6",
+    "hono": "^4.6.7",
     "merkletreejs": "^0.4.0",
-    "viem": "^1.19.3"
+    "viem": "^2.21.35"
   },
   "devDependencies": {
     "@types/node": "^20.9.0",
     "eslint": "^8.53.0",
-    "eslint-config-ponder": "^0.4.42",
+    "eslint-config-ponder": "^0.6",
     "typescript": "^5.2.2"
   },
   "engines": {
