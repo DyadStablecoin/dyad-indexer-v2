@@ -79,21 +79,28 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
 
     console.log("Root", root);
 
-
-    const defender = new Defender({
-        apiKey: process.env.RELAY_API_KEY,
-        apiSecret: process.env.RELAY_API_SECRET,
+    const lastOnchainUpdateBlock = await context.client.readContract({
+        abi: ponderConfig.contracts.LPStakingFactory.abi,
+        address: ponderConfig.contracts.LPStakingFactory.address,
+        functionName: "lastUpdateBlock"
     });
 
-    // await defender.relaySigner.sendTransaction({
-    //     to: ponderConfig.contracts.LPStakingFactory.address,
-    //     data: encodeFunctionData({
-    //         abi: ponderConfig.contracts.LPStakingFactory.abi,
-    //         functionName: "setRoot",
-    //         args: [root as Hex, event.block.number]
-    //     }),
-    //     gasLimit: 100_000
-    // })
+    if (lastOnchainUpdateBlock < toBlock) {
+        const defender = new Defender({
+            apiKey: process.env.RELAY_API_KEY,
+            apiSecret: process.env.RELAY_API_SECRET,
+        });
+
+        // await defender.relaySigner.sendTransaction({
+        //     to: ponderConfig.contracts.LPStakingFactory.address,
+        //     data: encodeFunctionData({
+        //         abi: ponderConfig.contracts.LPStakingFactory.abi,
+        //         functionName: "setRoot",
+        //         args: [root as Hex, event.block.number]
+        //     }),
+        //     gasLimit: 100_000
+        // })
+    }
 });
 
 async function computeTotalRewards(blockNumber: bigint, context: Context) {
