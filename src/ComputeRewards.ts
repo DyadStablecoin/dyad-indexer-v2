@@ -1,6 +1,6 @@
 import { Context } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther, Prettify } from "viem";
+import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
 import { buildMerkleTree } from "./buildMerkleTree";
@@ -92,20 +92,21 @@ export async function handleComputeRewards({ event, context }: { event: {
     });
 
     if (lastOnchainUpdateBlock < toBlock) {
+        console.log("Setting root onchain", toBlock);
         const defender = new Defender({
-            apiKey: process.env.RELAY_API_KEY,
-            apiSecret: process.env.RELAY_API_SECRET,
+            relayerApiKey: process.env.RELAY_API_KEY,
+            relayerApiSecret: process.env.RELAY_API_SECRET,
         });
 
-        // await defender.relaySigner.sendTransaction({
-        //     to: ponderConfig.contracts.LPStakingFactory.address,
-        //     data: encodeFunctionData({
-        //         abi: ponderConfig.contracts.LPStakingFactory.abi,
-        //         functionName: "setRoot",
-        //         args: [root as Hex, event.block.number]
-        //     }),
-        //     gasLimit: 100_000
-        // })
+        await defender.relaySigner.sendTransaction({
+            to: ponderConfig.contracts.LPStakingFactory.address,
+            data: encodeFunctionData({
+                abi: ponderConfig.contracts.LPStakingFactory.abi,
+                functionName: "setRoot",
+                args: [root as Hex, event.block.number]
+            }),
+            gasLimit: 100_000
+        })
     }
 };
 
