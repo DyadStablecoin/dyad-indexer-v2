@@ -1,0 +1,7 @@
+
+const XP_TANH_FACTOR = 8;
+const LP_TANH_FACTOR = 3;
+
+const BLOCK_TIME = 12;
+
+export { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME };

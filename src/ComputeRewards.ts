@@ -4,11 +4,7 @@ import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUn
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
 import { buildMerkleTree } from "./buildMerkleTree";
-
-const XP_TANH_FACTOR = 8;
-const LP_TANH_FACTOR = 3;
-
-const BLOCK_TIME = 12;
+import { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME } from "./constants";
 
 ponder.on("ComputeRewards:block", async ({ event, context }) => {
     console.log("ComputeRewards:block", event.block.number);
