@@ -170,6 +170,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
 }
 
 export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
+    console.log("ComputeRewardsForPeriod", rewardRate, pool, fromBlock, toBlock);
     const { Liquidity, NoteLiquidity } = context.db;
 
     const liquidityItems = [];
@@ -194,6 +195,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
     } while (hasNextPage)
     const totalSnapshotsInPeriod = liquidityItems.length;
 
+    console.log("Total snapshots in period", totalSnapshotsInPeriod);
     if (totalSnapshotsInPeriod === 0) {
         return {};
     }
@@ -242,6 +244,9 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
     let totalSize = 0;
     let scaledSizeByNoteId: Record<number, number> = {};
 
+    console.log("Total XP", totalXpScaled);
+    console.log("Total Liquidity", totalLiquidityScaled);
+
     for (const [noteId, participant] of Object.entries(participants)) {
         const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
         const scaledLiquidity = Number(formatUnits(participant.liquidity, 18));
@@ -250,6 +255,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
 
         const boostedSize = tanhXP * tanhLP;
+        console.log(`Note ${noteId} Boosted size`, boostedSize);
         totalSize += boostedSize;
         scaledSizeByNoteId[Number(noteId)] = boostedSize;
     }

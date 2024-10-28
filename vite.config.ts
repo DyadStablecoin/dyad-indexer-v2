@@ -11,13 +11,11 @@ export default defineConfig({
     test: {
         globalSetup: [],
         setupFiles: [],
-        poolOptions: {
-            threads: {
-                maxThreads: 4,
-                minThreads: 1,
-            },
-        },
         sequence: { hooks: "stack" },
         testTimeout: os.platform() === "win32" ? 30_000 : 10_000,
+        onConsoleLog: (log) => {
+            console.log(log);
+            return true;
+        },
     },
 });
