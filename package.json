@@ -8,7 +8,8 @@
     "start": "ponder start",
     "codegen": "ponder codegen",
     "lint": "eslint .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest"
   },
   "dependencies": {
     "@openzeppelin/defender-sdk": "^1.15.0",
@@ -21,6 +22,7 @@
     "@types/node": "^20.9.0",
     "eslint": "^8.53.0",
     "eslint-config-ponder": "^0.6",
+    "vitest": "^2.1.1",
     "typescript": "^5.2.2"
   },
   "engines": {

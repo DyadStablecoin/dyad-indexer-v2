@@ -1,12 +1,15 @@
-import { Context, ponder } from "@/generated";
+import { Context } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther } from "viem";
+import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther, Prettify } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
 import { buildMerkleTree } from "./buildMerkleTree";
 import { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME } from "./constants";
+import { Block } from "@ponder/core";
 
-ponder.on("ComputeRewards:block", async ({ event, context }) => {
+export async function handleComputeRewards({ event, context }: { event: {
+    block: Prettify<Block>;
+}, context: Context }) {
     console.log("ComputeRewards:block", event.block.number);
 
     const { Pool, RewardRate, Reward } = context.db;
@@ -104,7 +107,7 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
         //     gasLimit: 100_000
         // })
     }
-});
+};
 
 async function computeTotalRewards(blockNumber: bigint, context: Context) {
     const client = context.client;
@@ -166,7 +169,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     return tree.getHexRoot();
 }
 
-async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
+export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
     const { Liquidity, NoteLiquidity } = context.db;
 
     const liquidityItems = [];
@@ -220,6 +223,7 @@ async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBl
 
     let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
+    let numberOfParticipants = 0;
     let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
 
     for (const note of noteLiquidityItems) {
@@ -228,20 +232,21 @@ async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBl
         totalXpInPeriod += note.xp;
         if (!participants[noteId]) {
             participants[noteId] = { liquidity: 0n, xp: 0n };
+            numberOfParticipants++;
         }
-        participants[noteId].liquidity += note.liquidity;
-        participants[noteId].xp += note.xp;
+        participants[noteId]!.liquidity += note.liquidity;
+        participants[noteId]!.xp += note.xp;
     }
 
-    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27));
-    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod, 18));
+    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
+    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod / BigInt(totalSnapshotsInPeriod), 18)) / numberOfParticipants;
 
     let totalSize = 0;
     let scaledSizeByNoteId: Record<number, number> = {};
 
     for (const [noteId, participant] of Object.entries(participants)) {
         const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
-        const scaledLiquidity = Number(formatUnits(participant.liquidity, 18));
+        const scaledLiquidity = Number(formatUnits(participant.liquidity / BigInt(totalSnapshotsInPeriod), 18));
 
         const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
         const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
