@@ -1,12 +1,15 @@
-import { Context, ponder } from "@/generated";
+import { Context } from "@/generated";
 import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther } from "viem";
+import { Address, createPublicClient, encodeAbiParameters, formatEther, formatUnits, keccak256, parseEther, Prettify } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
 import { buildMerkleTree } from "./buildMerkleTree";
 import { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME } from "./constants";
+import { Block } from "@ponder/core";
 
-ponder.on("ComputeRewards:block", async ({ event, context }) => {
+export async function handleComputeRewards({ event, context }: { event: {
+    block: Prettify<Block>;
+}, context: Context }) {
     console.log("ComputeRewards:block", event.block.number);
 
     const { Pool, RewardRate, Reward } = context.db;
@@ -104,7 +107,7 @@ ponder.on("ComputeRewards:block", async ({ event, context }) => {
         //     gasLimit: 100_000
         // })
     }
-});
+};
 
 async function computeTotalRewards(blockNumber: bigint, context: Context) {
     const client = context.client;
@@ -166,7 +169,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     return tree.getHexRoot();
 }
 
-async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
+export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
     const { Liquidity, NoteLiquidity } = context.db;
 
     const liquidityItems = [];
