@@ -5,6 +5,7 @@ import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
 import ponderConfig from "../../ponder.config";
 import { LP_TANH_FACTOR, XP_TANH_FACTOR } from "../constants";
+import { HTTPException } from "hono/http-exception";
  
 ponder.use("/", graphql());
 ponder.use("/graphql", graphql());
@@ -37,8 +38,16 @@ ponder.get("/api/rewards/:id", async (context) => {
     root    
   });
 });
-ponder.post("/api/yield", async (context) => {
-  const { pool: reqToken, noteId: reqNoteId } = await context.req.json();
+ponder.get("/api/yield", async (context) => {
+  const { pool: reqToken, noteId: reqNoteId } = context.req.query();
+
+  if (!reqNoteId) {
+    throw new HTTPException(400, {message: "Missing noteId" });
+  }
+
+  if (!reqToken) {
+    throw new HTTPException(400, {message: "Missing token" });
+  }
 
   const noteId = BigInt(reqNoteId);
 
@@ -49,9 +58,7 @@ ponder.post("/api/yield", async (context) => {
     .limit(1);
 
   if (pool.length === 0) {
-    return context.json({
-      error: "Pool not found"
-    });
+    throw new HTTPException(400, {message: "Pool not found" });
   }
 
   const liquidity = await context.db.select()
