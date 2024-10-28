@@ -234,8 +234,8 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
             participants[noteId] = { liquidity: 0n, xp: 0n };
             numberOfParticipants++;
         }
-        participants[noteId].liquidity += note.liquidity;
-        participants[noteId].xp += note.xp;
+        participants[noteId]!.liquidity += note.liquidity;
+        participants[noteId]!.xp += note.xp;
     }
 
     const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
