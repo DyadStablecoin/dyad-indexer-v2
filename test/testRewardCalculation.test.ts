@@ -47,12 +47,17 @@ describe('Reward Calculation', () => {
 
         const result = await computeRewardsForPeriod(parseEther("1"), "0x0000000000000000000000000000000000000000", BigInt(0), BigInt(100), mockContext);
 
-        const totalRewards = Object.values(result).reduce((acc, curr) => acc + curr, 0n);
-        console.log("Total rewards", formatEther(totalRewards));
-        console.log("Note 1 rewards", formatEther(result[1]!))
-        console.log("Note 2 rewards", formatEther(result[2]!));
-        console.log("Note 3 rewards", formatEther(result[3]!));
-        console.log("Note 4 rewards", formatEther(result[4]!));
-        console.log("Note 5 rewards", formatEther(result[5]!));
+        const totalRewards = Number(formatEther(Object.values(result).reduce((acc, curr) => acc + curr, 0n)));
+
+        const noteRewards = Object.entries(result).reduce((acc, [noteId, reward]) => {
+            acc[noteId] = Number(formatEther(reward));
+            return acc;
+        }, {} as Record<string, number>);
+
+        expect(noteRewards[1]! / totalRewards).toBeCloseTo(0.2029110, 7);
+        expect(noteRewards[2]! / totalRewards).toBeCloseTo(0.1287961, 7);
+        expect(noteRewards[3]! / totalRewards).toBeCloseTo(0.4638979, 7);
+        expect(noteRewards[4]! / totalRewards).toBeCloseTo(0.2029110, 7);
+        expect(noteRewards[5]! / totalRewards).toBeCloseTo(0.0014839, 7);
     });
 });
