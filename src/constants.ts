@@ -1,6 +1,6 @@
 
 const XP_TANH_FACTOR = 8;
-const LP_TANH_FACTOR = 3;
+const LP_TANH_FACTOR = 1;
 
 const BLOCK_TIME = 12;
 
