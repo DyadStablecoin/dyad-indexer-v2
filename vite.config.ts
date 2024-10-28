@@ -13,9 +13,5 @@ export default defineConfig({
         setupFiles: [],
         sequence: { hooks: "stack" },
         testTimeout: os.platform() === "win32" ? 30_000 : 10_000,
-        onConsoleLog: (log) => {
-            console.log(log);
-            return true;
-        },
     },
 });
