@@ -225,6 +225,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
 
     let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
+    let numberOfParticipants = 0;
     let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
 
     for (const note of noteLiquidityItems) {
@@ -233,13 +234,14 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         totalXpInPeriod += note.xp;
         if (!participants[noteId]) {
             participants[noteId] = { liquidity: 0n, xp: 0n };
+            numberOfParticipants++;
         }
         participants[noteId].liquidity += note.liquidity;
         participants[noteId].xp += note.xp;
     }
 
-    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27));
-    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod, 18));
+    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
+    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod / BigInt(totalSnapshotsInPeriod), 18)) / numberOfParticipants;
 
     let totalSize = 0;
     let scaledSizeByNoteId: Record<number, number> = {};
@@ -249,7 +251,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
 
     for (const [noteId, participant] of Object.entries(participants)) {
         const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
-        const scaledLiquidity = Number(formatUnits(participant.liquidity, 18));
+        const scaledLiquidity = Number(formatUnits(participant.liquidity / BigInt(totalSnapshotsInPeriod), 18));
 
         const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
         const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
