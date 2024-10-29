@@ -147,6 +147,9 @@ ponder.get("/api/yield", async (context) => {
     noteLiquidity: formatUnits(amountDeposited, 18),
     noteXp: formatUnits(xpAmount, 27),
     rewardRate: formatUnits(rewardRate, 18),
+    effectiveSize: noteBoostedSize,
+    totalEffectiveSize,
+    maxEffectiveSize: LP_TANH_FACTOR * XP_TANH_FACTOR,
     kerosenePerYear: formatUnits(rewardPerYear, 18),
   });
 });
