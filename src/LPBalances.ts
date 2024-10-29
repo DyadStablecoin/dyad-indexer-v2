@@ -61,7 +61,21 @@ ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
 ponder.on("IndexLPBalances:block", async ({ event, context }) => {
   console.log("IndexLPBalances:block", event.block.number);
 
-  const { NoteLiquidity, Liquidity, Pool } = context.db;
+  const { NoteLiquidity, Liquidity, Pool, TotalReward } = context.db;
+
+  // Check if the total reward has already been updated for a later block and skip if so
+  const alreadyUpdated = await TotalReward.findMany({
+    limit: 1,
+    where: {
+      lastUpdated: {
+        gt: event.block.number,
+      }
+    }
+  });
+
+  if (alreadyUpdated.items.length > 0) {
+    return;
+  }
 
   const pools = await Pool.findMany();
 
