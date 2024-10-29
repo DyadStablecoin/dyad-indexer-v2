@@ -25,15 +25,18 @@ ponder.get("/api/rewards/:id", async (context) => {
   if (noteRewards.length === 0) {
     return context.json({
       amount: "0",
+      //leaf: "0x",
       proof: [],
       root
     });
   }
 
-  const proof = tree.getHexProof(getLeaf(noteRewards[0]!));
+  const leaf = getLeaf(noteRewards[0]!);
+  const proof = tree.getHexProof(leaf);
 
   return context.json({
     amount: noteRewards[0]!.amount.toString(),
+    //leaf,
     proof,
     root    
   });
@@ -119,8 +122,8 @@ ponder.get("/api/yield", async (context) => {
     }
   }
 
-  const totalXpScaled = Number(formatUnits(totalXp, 27));
-  const totalLiquidityScaled = Number(formatUnits(totalLiquidity, 18));
+  const totalXpScaled = Number(formatUnits(totalXp, 27)) / totalParticipants;
+  const totalLiquidityScaled = Number(formatUnits(totalLiquidity, 18)) / totalParticipants;
 
   const noteBoostedSize = computeBoostedSize(xpAmount, amountDeposited, totalXpScaled, totalLiquidityScaled);
   let totalEffectiveSize = noteBoostedSize;

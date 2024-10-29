@@ -8,7 +8,8 @@ export function getLeaf(reward: {
     lastUpdated: bigint;
 }) {
     const packed = encodePacked(["uint256", "uint256"], [reward.id, reward.amount]);
-    return keccak256(packed);
+    const leaf = keccak256(keccak256(packed));
+    return leaf;
 }
 
 export function buildMerkleTree(allRewards: {
@@ -19,7 +20,7 @@ export function buildMerkleTree(allRewards: {
 
     const leaves = allRewards.map(getLeaf);
 
-    const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+    const tree = new MerkleTree(leaves, keccak256<"bytes">, { sortPairs: true });
     return tree;
 }
 

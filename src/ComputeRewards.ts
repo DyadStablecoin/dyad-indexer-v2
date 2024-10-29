@@ -91,7 +91,7 @@ export async function handleComputeRewards({ event, context }: { event: {
         functionName: "lastUpdateBlock"
     });
 
-    if (lastOnchainUpdateBlock < toBlock) {
+    if (lastOnchainUpdateBlock < toBlock && process.env.RELAY_API_KEY && process.env.RELAY_API_SECRET) {
         console.log("Setting root onchain", toBlock);
         const defender = new Defender({
             relayerApiKey: process.env.RELAY_API_KEY,
