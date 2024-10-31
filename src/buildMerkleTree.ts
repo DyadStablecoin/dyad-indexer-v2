@@ -1,7 +1,6 @@
 import MerkleTree from "merkletreejs";
 import { encodePacked, keccak256 } from "viem";
 
-
 export function getLeaf(reward: {
     amount: bigint;
     id: bigint;
@@ -17,7 +16,6 @@ export function buildMerkleTree(allRewards: {
     id: bigint;
     lastUpdated: bigint;
 }[]) {
-
     const leaves = allRewards.map(getLeaf);
 
     const tree = new MerkleTree(leaves, keccak256<"bytes">, { sortPairs: true });

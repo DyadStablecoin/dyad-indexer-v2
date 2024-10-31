@@ -1,5 +1,5 @@
 import { ponder } from "@/generated";
-import { desc, eq, graphql } from "@ponder/core";
+import { asc, desc, eq, graphql } from "@ponder/core";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
@@ -17,7 +17,8 @@ ponder.get("/api/rewards/:id", async (context) => {
     .where(eq(context.tables.TotalReward.id, BigInt(id)));
 
   const allRewards = await context.db.select()
-    .from(context.tables.TotalReward);
+    .from(context.tables.TotalReward)
+    .orderBy(asc(context.tables.TotalReward.id));
 
   const tree = buildMerkleTree(allRewards);
   const root = tree.getHexRoot();
