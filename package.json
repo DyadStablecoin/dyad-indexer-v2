@@ -17,6 +17,7 @@
     "@ponder/core": "^0.6",
     "hono": "^4.6.7",
     "merkletreejs": "^0.4.0",
+    "npx": "^10.2.2",
     "viem": "^2.21.35"
   },
   "devDependencies": {
