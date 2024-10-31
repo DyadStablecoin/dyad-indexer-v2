@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import * as url from 'node:url';
 import { buildMerkleTree } from "./src/buildMerkleTree";
+import path from "path";
 
 async function main() {
     console.log("Generating rewards snapshot...");
@@ -37,7 +38,10 @@ async function main() {
 
     const lastBlock = Math.max(...allItems.map((item) => Number(item.lastUpdated)));
 
-    await fs.writeFile("./generated/rewardsSnapshot.ts", 
+    const modulePath = url.fileURLToPath(import.meta.url);
+    const generatedPath = path.join(path.dirname(modulePath), "generated/rewardsSnapshot.ts");
+    
+    await fs.writeFile(generatedPath, 
 `export const LAST_REWARDS_BLOCK = ${lastBlock};
 export const REWARDS = ${JSON.stringify(allItems, null, 2)};`)
 
