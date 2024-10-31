@@ -4,6 +4,11 @@ import { buildMerkleTree } from "./src/buildMerkleTree";
 import path from "path";
 
 async function main() {
+
+    const syncUrl = process.env.RAILWAY_PUBLIC_DOMAIN 
+        ? `${process.env.RAILWAY_PUBLIC_DOMAIN}` 
+        : "api.dyadstable.xyz";
+
     console.log("Generating rewards snapshot...");
 
     const allItems: any[] = [];
@@ -11,7 +16,7 @@ async function main() {
     let hasNextPage: boolean = false
     do {
         const after = cursor ? `, after: "${cursor}"` : "";
-        const response = await fetch("https://api.dyadstable.xyz/graphql", {
+        const response = await fetch(`https://${syncUrl}/graphql`, {
             method: "POST",
         headers: {
             "Content-Type": "application/graphql"
