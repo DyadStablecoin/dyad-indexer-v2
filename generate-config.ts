@@ -37,7 +37,7 @@ async function main() {
 
     const lastBlock = Math.max(...allItems.map((item) => Number(item.lastUpdated)));
 
-    await fs.writeFile("generated/rewardsSnapshot.ts", 
+    await fs.writeFile("./generated/rewardsSnapshot.ts", 
 `export const LAST_REWARDS_BLOCK = ${lastBlock};
 export const REWARDS = ${JSON.stringify(allItems, null, 2)};`)
 
