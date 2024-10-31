@@ -1,4 +1,4 @@
-import { ponder } from "@/generated";
+import { ApiContext, ponder } from "@/generated";
 import { asc, desc, eq, graphql } from "@ponder/core";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
@@ -6,7 +6,7 @@ import { mainnet } from "viem/chains";
 import ponderConfig from "../../ponder.config";
 import { LP_TANH_FACTOR, XP_TANH_FACTOR } from "../constants";
 import { HTTPException } from "hono/http-exception";
- 
+
 ponder.use("/", graphql());
 ponder.use("/graphql", graphql());
 ponder.get("/api/rewards/:id", async (context) => {
@@ -39,18 +39,18 @@ ponder.get("/api/rewards/:id", async (context) => {
     amount: noteRewards[0]!.amount.toString(),
     //leaf,
     proof,
-    root    
+    root
   });
 });
 ponder.get("/api/yield", async (context) => {
   const { pool: reqToken, noteId: reqNoteId } = context.req.query();
 
   if (!reqNoteId) {
-    throw new HTTPException(400, {message: "Missing noteId" });
+    throw new HTTPException(400, { message: "Missing noteId" });
   }
 
   if (!reqToken) {
-    throw new HTTPException(400, {message: "Missing token" });
+    throw new HTTPException(400, { message: "Missing token" });
   }
 
   const noteId = BigInt(reqNoteId);
@@ -62,12 +62,35 @@ ponder.get("/api/yield", async (context) => {
     .limit(1);
 
   if (pool.length === 0) {
-    throw new HTTPException(400, {message: "Pool not found" });
+    throw new HTTPException(400, { message: "Pool not found" });
   }
 
+  const result = await getYieldsForPool(pool[0]!, noteId, context);
+
+  return context.json(result);
+});
+ponder.get("/api/yields/:id", async (context) => {
+  const id = context.req.param("id");
+
+  const results: Record<string, any> = {};
+
+  const noteId = BigInt(id);
+
+  const pools = await context.db.select()
+    .from(context.tables.Pool);
+
+  for (const pool of pools) {
+    results[pool.id] = await getYieldsForPool(pool, noteId, context);
+  }
+
+  return context.json(results);
+});
+
+
+async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: bigint, context: ApiContext) {
   const liquidity = await context.db.select()
     .from(context.tables.Liquidity)
-    .where(eq(context.tables.Liquidity.pool, pool[0]!.id))
+    .where(eq(context.tables.Liquidity.pool, pool.id))
     .orderBy(desc(context.tables.Liquidity.timestamp))
     .limit(1);
 
@@ -83,7 +106,7 @@ ponder.get("/api/yield", async (context) => {
   const balances = await publicClient.multicall({
     contracts: [
       {
-        address: pool[0]!.id as `0x${string}`,
+        address: pool.id as `0x${string}`,
         abi: ponderConfig.contracts.Staking.abi,
         functionName: "noteIdToAmountDeposited",
         args: [noteId]
@@ -98,15 +121,13 @@ ponder.get("/api/yield", async (context) => {
         address: ponderConfig.contracts.LPStakingFactory.address as `0x${string}`,
         abi: ponderConfig.contracts.LPStakingFactory.abi,
         functionName: "lpTokenToRewardRate",
-        args: [lpToken as `0x${string}`]
+        args: [pool.lpToken as `0x${string}`]
       }
     ],
     allowFailure: false
   });
 
   let [amountDeposited, xpAmount, rewardRate] = balances;
-
-  console.log(amountDeposited, xpAmount, rewardRate);
 
   let totalLiquidity = amountDeposited;
   let totalXp = xpAmount;
@@ -142,7 +163,8 @@ ponder.get("/api/yield", async (context) => {
 
   const rewardPerYear = (rewardPerSecondWad * 31536000n) / BigInt(1e18); // 31536000 seconds in a year
 
-  return context.json({
+  return {
+    lpToken: pool.lpToken,
     totalLiquidity: formatUnits(totalLiquidity, 18),
     totalXp: formatUnits(totalXp, 27),
     noteLiquidity: formatUnits(amountDeposited, 18),
@@ -152,17 +174,17 @@ ponder.get("/api/yield", async (context) => {
     totalEffectiveSize,
     maxEffectiveSize: LP_TANH_FACTOR * XP_TANH_FACTOR,
     kerosenePerYear: formatUnits(rewardPerYear, 18),
-  });
-});
+  }
+}
 
 function computeBoostedSize(xp: bigint, liquidity: bigint, totalXpScaled: number, totalLiquidityScaled: number) {
   const scaledXp = Number(formatUnits(xp, 27));
-    const scaledLiquidity = Number(formatUnits(liquidity, 18));
+  const scaledLiquidity = Number(formatUnits(liquidity, 18));
 
-    const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
-    const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
+  const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
+  const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
 
-    const boostedSize = tanhXP * tanhLP;
+  const boostedSize = tanhXP * tanhLP;
 
-    return boostedSize;
+  return boostedSize;
 }
