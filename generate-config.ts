@@ -40,7 +40,8 @@ async function main() {
 
     const modulePath = url.fileURLToPath(import.meta.url);
     const generatedPath = path.join(path.dirname(modulePath), "generated/rewardsSnapshot.ts");
-    
+
+    await fs.mkdir(path.dirname(generatedPath), { recursive: true });
     await fs.writeFile(generatedPath, 
 `export const LAST_REWARDS_BLOCK = ${lastBlock};
 export const REWARDS = ${JSON.stringify(allItems, null, 2)};`)
