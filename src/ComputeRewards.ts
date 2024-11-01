@@ -4,8 +4,10 @@ import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, f
 import { Defender } from "@openzeppelin/defender-sdk";
 import { mainnet } from "viem/chains";
 import { buildMerkleTree } from "./buildMerkleTree";
-import { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME } from "./constants";
 import { Block } from "@ponder/core";
+import { computeBoostedSize } from "./computeBoostedSize";
+import { median } from "./utils";
+import { BLOCK_TIME } from "./constants";
 
 export async function handleComputeRewards({ event, context }: { event: {
     block: Prettify<Block>;
@@ -222,14 +224,13 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         cursor = noteLiquidity.pageInfo.endCursor ?? undefined;
     } while (hasNextPage)
 
-    let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
     let numberOfParticipants = 0;
     let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
+    const lpSizes: bigint[] = [];
 
     for (const note of noteLiquidityItems) {
         const noteId = Number(note.noteId);
-        totalLiquidityInPeriod += note.liquidity;
         totalXpInPeriod += note.xp;
         if (!participants[noteId]) {
             participants[noteId] = { liquidity: 0n, xp: 0n };
@@ -237,22 +238,18 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         }
         participants[noteId]!.liquidity += note.liquidity;
         participants[noteId]!.xp += note.xp;
+        lpSizes.push(note.liquidity);
     }
 
     const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
-    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod / BigInt(totalSnapshotsInPeriod), 18)) / numberOfParticipants;
+    const medianLiquidityScaled = median(lpSizes.map(n => Number(formatUnits(n, 18))));
 
     let totalSize = 0;
     let scaledSizeByNoteId: Record<number, number> = {};
 
-    for (const [noteId, participant] of Object.entries(participants)) {
-        const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
-        const scaledLiquidity = Number(formatUnits(participant.liquidity / BigInt(totalSnapshotsInPeriod), 18));
+    for (const [noteId, participant] of Object.entries(participants)) {        
+        const boostedSize = computeBoostedSize(participant.xp, participant.liquidity, totalXpScaled, medianLiquidityScaled);
 
-        const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
-        const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
-
-        const boostedSize = tanhXP * tanhLP;
         totalSize += boostedSize;
         scaledSizeByNoteId[Number(noteId)] = boostedSize;
     }
