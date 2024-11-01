@@ -1,4 +1,4 @@
-import { MerkleTree } from "merkletreejs";
+import MerkleTree from "merkletreejs";
 import { encodePacked, keccak256 } from "viem";
 
 export function getLeaf(reward: {
