@@ -5,9 +5,7 @@ import path from "path";
 
 async function main() {
 
-    const syncUrl = process.env.RAILWAY_PUBLIC_DOMAIN 
-        ? `${process.env.RAILWAY_PUBLIC_DOMAIN}` 
-        : "api.dyadstable.xyz";
+    const syncUrl = "api.dyadstable.xyz";
 
     console.log("Generating rewards snapshot...");
 
