@@ -133,7 +133,9 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
             where: {
                 noteId: BigInt(i),
                 fromBlockNumber: {
-                    gt: lastTotalReward?.lastUpdated
+                    // use gte here because the last updated reward
+                    // does not include the rewards computed in that block
+                    gte: lastTotalReward?.lastUpdated
                 }
             }
         });
