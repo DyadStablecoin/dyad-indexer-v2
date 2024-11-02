@@ -137,7 +137,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
         const rewards = await Reward.findMany({
             where: {
                 noteId: BigInt(i),
-                fromBlockNumber: {
+                toBlockNumber: {
                     // use gte here because the last updated reward
                     // does not include the rewards computed in that block
                     gte: lastTotalReward?.lastUpdated
