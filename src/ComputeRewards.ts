@@ -127,13 +127,21 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     });
 
     for (let i = 0; i < dnftSupply; i++) {
+        const lastTotalReward = await TotalReward.findUnique({
+            id: BigInt(i)
+        });
+
         const rewards = await Reward.findMany({
             where: {
-                noteId: BigInt(i)
+                noteId: BigInt(i),
+                fromBlockNumber: {
+                    gt: lastTotalReward?.lastUpdated
+                }
             }
         });
 
-        const totalReward = rewards.items.reduce((acc, curr) => acc + curr.amount, 0n);
+        const lastTotalRewardAmount = lastTotalReward?.amount ?? 0n;
+        const totalReward = lastTotalRewardAmount + rewards.items.reduce((acc, curr) => acc + curr.amount, 0n);
 
         if (totalReward === 0n) {
             continue;
