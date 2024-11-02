@@ -1,13 +1,15 @@
-import { ApiContext, ponder } from "@/generated";
 import { asc, desc, eq, graphql } from "@ponder/core";
-import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
+import { HTTPException } from "hono/http-exception";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
+
+import { ApiContext, ponder } from "@/generated";
+
 import ponderConfig from "../../ponder.config";
-import { LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from "../constants";
-import { HTTPException } from "hono/http-exception";
-import { median } from "../utils";
+import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
 import { computeBoostedSize } from "../computeBoostedSize";
+import { LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from "../constants";
+import { median } from "../utils";
 
 ponder.use("/", graphql());
 ponder.use("/graphql", graphql());
@@ -129,7 +131,7 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     allowFailure: false
   });
 
-  let [amountDeposited, xpAmount, rewardRate] = balances;
+  const [amountDeposited, xpAmount, rewardRate] = balances;
 
   let totalLiquidity = amountDeposited;
   const lpSizes = [amountDeposited]

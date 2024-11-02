@@ -1,6 +1,7 @@
 import { ponder } from "@/generated";
-import { handleComputeRewards } from "./ComputeRewards";
+
 import { REWARDS } from "../generated/rewardsSnapshot";
+import { handleComputeRewards } from "./ComputeRewards";
 import { config } from "./config";
 
 ponder.on("LPStakingFactory:setup", async ({ context }) => {

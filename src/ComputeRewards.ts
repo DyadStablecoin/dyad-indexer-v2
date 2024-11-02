@@ -1,14 +1,16 @@
-import { Context } from "@/generated";
-import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
-import { mainnet } from "viem/chains";
-import { buildMerkleTree } from "./buildMerkleTree";
 import { Block } from "@ponder/core";
+import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
+import { mainnet } from "viem/chains";
+
+import { Context } from "@/generated";
+
+import ponderConfig from "../ponder.config";
+import { buildMerkleTree } from "./buildMerkleTree";
 import { computeBoostedSize } from "./computeBoostedSize";
-import { median } from "./utils";
-import { BLOCK_TIME } from "./constants";
 import { config } from "./config";
+import { BLOCK_TIME } from "./constants";
+import { median } from "./utils";
 
 export async function handleComputeRewards({ event, context }: { event: {
     block: Prettify<Block>;
@@ -44,7 +46,7 @@ export async function handleComputeRewards({ event, context }: { event: {
                 continue;
             }
 
-            let thisFromBlock = BigInt(Math.max(Number(fromBlock), Number(rate.blockNumber)));
+            const thisFromBlock = BigInt(Math.max(Number(fromBlock), Number(rate.blockNumber)));
 
             const rewardsForPeriod = await computeRewardsForPeriod(
                 rate.rate, 
@@ -240,7 +242,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
 
     let totalXpInPeriod = 0n;
     let numberOfParticipants = 0;
-    let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
+    const participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
     const lpSizes: bigint[] = [];
 
     for (const note of noteLiquidityItems) {
@@ -259,7 +261,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
     const medianLiquidityScaled = median(lpSizes.map(n => Number(formatUnits(n, 18))));
 
     let totalSize = 0;
-    let scaledSizeByNoteId: Record<number, number> = {};
+    const scaledSizeByNoteId: Record<number, number> = {};
 
     for (const [noteId, participant] of Object.entries(participants)) {        
         const participantAvgXpAcrossPeriod = participant.xp / BigInt(totalSnapshotsInPeriod);

@@ -1,7 +1,9 @@
-import fs from "fs/promises";
 import * as url from 'node:url';
-import { buildMerkleTree } from "./src/buildMerkleTree";
+
+import fs from "fs/promises";
 import path from "path";
+
+import { buildMerkleTree } from "./src/buildMerkleTree";
 
 async function main() {
 
@@ -11,7 +13,7 @@ async function main() {
 
     const allItems: any[] = [];
     let cursor: string | undefined = undefined;
-    let hasNextPage: boolean = false
+    let hasNextPage = false
     do {
         const after = cursor ? `, after: "${cursor}"` : "";
         const response = await fetch(`https://${syncUrl}/graphql`, {

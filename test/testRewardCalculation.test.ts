@@ -1,11 +1,11 @@
 import { formatEther, parseEther, parseUnits, zeroAddress } from "viem";
+import { describe, expect, it,vi } from "vitest";
+
 import { computeRewardsForPeriod } from "../src/ComputeRewards";
-import { beforeEach, describe, expect, test, vi, it } from "vitest";
 
 describe('Reward Calculation', () => {
     it('should calculate the reward correctly', async () => {
         console.log("Starting test");
-        const pool = zeroAddress;
         const mockContext = {
             db: {
                 Liquidity: {
