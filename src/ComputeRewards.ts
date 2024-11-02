@@ -254,14 +254,17 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         lpSizes.push(note.liquidity);
     }
 
-    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
+    const averageXpAcrossPeriod = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
     const medianLiquidityScaled = median(lpSizes.map(n => Number(formatUnits(n, 18))));
 
     let totalSize = 0;
     let scaledSizeByNoteId: Record<number, number> = {};
 
     for (const [noteId, participant] of Object.entries(participants)) {        
-        const boostedSize = computeBoostedSize(participant.xp, participant.liquidity, totalXpScaled, medianLiquidityScaled);
+        const participantAvgXpAcrossPeriod = participant.xp / BigInt(totalSnapshotsInPeriod);
+        const participantAvgLiquidityAcrossPeriod = participant.liquidity / BigInt(totalSnapshotsInPeriod);
+
+        const boostedSize = computeBoostedSize(participantAvgXpAcrossPeriod, participantAvgLiquidityAcrossPeriod, averageXpAcrossPeriod, medianLiquidityScaled);
 
         totalSize += boostedSize;
         scaledSizeByNoteId[Number(noteId)] = boostedSize;

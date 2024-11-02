@@ -4,7 +4,7 @@ import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
 import ponderConfig from "../../ponder.config";
-import { LP_TANH_FACTOR, XP_TANH_FACTOR } from "../constants";
+import { LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from "../constants";
 import { HTTPException } from "hono/http-exception";
 import { median } from "../utils";
 import { computeBoostedSize } from "../computeBoostedSize";
@@ -177,7 +177,7 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     rewardRate: formatUnits(rewardRate, 18),
     effectiveSize: noteBoostedSize,
     totalEffectiveSize,
-    maxEffectiveSize: LP_TANH_FACTOR * XP_TANH_FACTOR,
+    maxEffectiveSize: LP_TANH_FACTOR * (XP_BASE_FACTOR + XP_TANH_FACTOR),
     kerosenePerYear: formatUnits(rewardPerYear, 18),
   }
 }
