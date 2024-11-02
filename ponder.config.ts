@@ -1,16 +1,15 @@
 import { createConfig, mergeAbis } from "@ponder/core";
 import { http, parseAbiItem } from "viem";
 
+import { DNftAbi } from "./abis/DNftAbi";
 import { ERC1967ProxyAbi } from "./abis/ERC1967ProxyAbi";
+import { LPStakingAbi } from "./abis/LPStaking";
+import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
+import { VaultAbi } from "./abis/VaultAbi";
 import { VaultManagerV2_0x1342Abi } from "./abis/VaultManagerV2_0x1342Abi";
 import { VaultManagerV3_0x5c1aAbi } from "./abis/VaultManagerV3_0x5c1aAbi";
 import { VaultManagerV4_0x2592Abi } from "./abis/VaultManagerV4_0x2592Abi";
-
-import { DNftAbi } from "./abis/DNftAbi";
-import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
-import { LPStakingAbi } from "./abis/LPStaking";
-import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
 import { LAST_REWARDS_BLOCK } from "./generated/rewardsSnapshot";
 
 const startBlock = LAST_REWARDS_BLOCK;

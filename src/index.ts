@@ -1,6 +1,7 @@
 import { ponder } from "@/generated";
-import { handleComputeRewards } from "./ComputeRewards";
+
 import { REWARDS } from "../generated/rewardsSnapshot";
+import { handleComputeRewards } from "./ComputeRewards";
 
 ponder.on("LPStakingFactory:setup", async ({ context }) => {
     const { TotalReward } = context.db;

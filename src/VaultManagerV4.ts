@@ -1,10 +1,12 @@
-import { Context, ponder } from "@/generated";
-import { VaultAbi } from "../abis/VaultAbi";
-import { DyadAbi } from "../abis/DyadAbi";
-import { DNftAbi } from "../abis/DNftAbi";
-import { XpABI } from "../abis/XpAbi";
-import { VaultManagerV4_0x2592Abi } from "../abis/VaultManagerV4_0x2592Abi";
 import { formatEther } from "viem";
+
+import { Context, ponder } from "@/generated";
+
+import { DNftAbi } from "../abis/DNftAbi";
+import { DyadAbi } from "../abis/DyadAbi";
+import { VaultAbi } from "../abis/VaultAbi";
+import { VaultManagerV4_0x2592Abi } from "../abis/VaultManagerV4_0x2592Abi";
+import { XpABI } from "../abis/XpAbi";
 
 ponder.on("GetXP:block", async ({ event, context }) => {
   console.log("GetXP:block", event.block.number);
@@ -15,7 +17,7 @@ ponder.on("GetXP:block", async ({ event, context }) => {
   });
 
   console.log(`Updating ${totalSupply} notes XP for block ${event.block.number}`);
-  let promises = [];
+  const promises = [];
   for (let id = 0; id < totalSupply; id++) {
     promises.push(updateNote(context, BigInt(id)));
   }

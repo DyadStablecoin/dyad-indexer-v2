@@ -1,5 +1,7 @@
-import { ponder } from "@/generated";
 import { Address, encodeAbiParameters, keccak256 } from "viem";
+
+import { ponder } from "@/generated";
+
 import config from "../ponder.config";
 
 ponder.on("LPStakingFactory:PoolStakingCreated", async ({ event, context }) => {
