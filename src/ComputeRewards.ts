@@ -188,8 +188,8 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     return tree.getHexRoot();
 }
 
-export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
-    const { Liquidity, NoteLiquidity } = context.db;
+export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, db: Pick<Context['db'], 'Liquidity' | 'NoteLiquidity'>) {
+    const { Liquidity, NoteLiquidity } = db;
 
     const liquidityItems = [];
 
