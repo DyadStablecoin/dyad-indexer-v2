@@ -8,6 +8,7 @@ import { Block } from "@ponder/core";
 import { computeBoostedSize } from "./computeBoostedSize";
 import { median } from "./utils";
 import { BLOCK_TIME } from "./constants";
+import { config } from "./config";
 
 export async function handleComputeRewards({ event, context }: { event: {
     block: Prettify<Block>;
@@ -94,13 +95,13 @@ export async function handleComputeRewards({ event, context }: { event: {
     });
 
     if (lastOnchainUpdateBlock < toBlock 
-        && process.env.RELAY_API_KEY 
-        && process.env.RELAY_API_SECRET
-        && process.env.RAILWAY_ENVIRONMENT_NAME === "production") {
+        && config.relayApiKey
+        && config.relayApiSecret
+        && config.railwayEnvironmentName === "production") {
         console.log("Setting root onchain", toBlock);
         const defender = new Defender({
-            relayerApiKey: process.env.RELAY_API_KEY,
-            relayerApiSecret: process.env.RELAY_API_SECRET,
+            relayerApiKey: config.relayApiKey,
+            relayerApiSecret: config.relayApiSecret,
         });
 
         await defender.relaySigner.sendTransaction({

@@ -12,12 +12,13 @@ import { XpABI } from "./abis/XpAbi";
 import { LPStakingAbi } from "./abis/LPStaking";
 import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
 import { LAST_REWARDS_BLOCK } from "./generated/rewardsSnapshot";
+import { config } from "./src/config";
 
 const startBlock = LAST_REWARDS_BLOCK;
 // config
 export default createConfig({
   networks: {
-    mainnet: { chainId: 1, transport: http(process.env.PONDER_RPC_URL_1) },
+    mainnet: { chainId: 1, transport: http(config.rpcUrl) },
   },
   blocks: {
     GetXP: {
