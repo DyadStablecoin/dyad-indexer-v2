@@ -1,8 +1,14 @@
 import { ponder } from "@/generated";
 import { handleComputeRewards } from "./ComputeRewards";
 import { REWARDS } from "../generated/rewardsSnapshot";
+import { config } from "./config";
 
 ponder.on("LPStakingFactory:setup", async ({ context }) => {
+
+    if (config.disableSnapshot) {
+        return;
+    }
+
     const { TotalReward } = context.db;
 
     await TotalReward.createMany({
