@@ -53,7 +53,7 @@ export async function handleComputeRewards({ event, context }: { event: {
                 pool.id as Address, 
                 BigInt(thisFromBlock), 
                 BigInt(lastToBlock), 
-                context);
+                context.db);
 
             await Reward.createMany({
                 data: Object.entries(rewardsForPeriod).map(([noteId, rewards]) => ({
