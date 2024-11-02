@@ -77,4 +77,22 @@ export default createSchema((p) => ({
     amount: p.bigint(),
     lastUpdated: p.bigint(), // block number
   }),
+
+  Liquidation: p.createTable({
+    id: p.string(), // tx hash
+    fromNoteId: p.bigint(),
+    toNoteId: p.bigint(),
+    blockNumber: p.bigint(),
+    amount: p.bigint(),
+    timestamp: p.bigint(),
+    details: p.many("LiquidationDetail.liquidationId"),
+  }),
+
+  LiquidationDetail: p.createTable({
+    id: p.string(), // keccak256(abi.encode(liquidation.id, vault))
+    liquidationId: p.string().references("Liquidation.id"),
+    vault: p.string(),
+    amount: p.bigint(),
+    timestamp: p.bigint(),
+  }),
 }));

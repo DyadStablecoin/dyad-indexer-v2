@@ -1,16 +1,8 @@
 import { ponder } from "@/generated";
 import { handleComputeRewards } from "./ComputeRewards";
-import { REWARDS } from "../generated/rewardsSnapshot";
+import { initializeSnapshotData } from "./LPBalances";
+import { handleLiquidate } from "./liquidation";
 
-ponder.on("LPStakingFactory:setup", async ({ context }) => {
-    const { TotalReward } = context.db;
-
-    await TotalReward.createMany({
-        data: REWARDS.map((reward) => ({
-            id: BigInt(reward.id),
-            amount: BigInt(reward.amount),
-            lastUpdated: BigInt(reward.lastUpdated)
-        }))
-    })
-});
+ponder.on("LPStakingFactory:setup", initializeSnapshotData);
 ponder.on("ComputeRewards:block", handleComputeRewards);
+ponder.on("VaultManagerV4:Liquidate", handleLiquidate);

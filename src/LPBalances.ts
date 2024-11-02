@@ -1,6 +1,19 @@
-import { ponder } from "@/generated";
+import { Context, ponder } from "@/generated";
 import { Address, encodeAbiParameters, keccak256 } from "viem";
 import config from "../ponder.config";
+import { REWARDS } from "../generated/rewardsSnapshot";
+
+export async function initializeSnapshotData({ context }: { context: Context }) {
+  const { TotalReward } = context.db;
+
+  await TotalReward.createMany({
+      data: REWARDS.map((reward) => ({
+          id: BigInt(reward.id),
+          amount: BigInt(reward.amount),
+          lastUpdated: BigInt(reward.lastUpdated)
+      }))
+  })
+}
 
 ponder.on("LPStakingFactory:PoolStakingCreated", async ({ event, context }) => {
   console.log("LPStakingFactory:PoolStakingCreated", event.args.staking);

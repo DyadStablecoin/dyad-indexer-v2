@@ -69,7 +69,7 @@ export default createConfig({
       ]),
       address: "0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7",
       network: "mainnet",
-      startBlock,
+      startBlock: 20013820,
     },
     DNft: {
       abi: DNftAbi,
