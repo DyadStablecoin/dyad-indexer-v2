@@ -11,9 +11,9 @@ import { VaultAbi } from "./abis/VaultAbi";
 import { XpABI } from "./abis/XpAbi";
 import { LPStakingAbi } from "./abis/LPStaking";
 import { LPStakingFactoryAbi } from "./abis/LPStakingFactory";
-import { DyadAbi } from "./abis/DyadAbi";
+import { LAST_REWARDS_BLOCK } from "./generated/rewardsSnapshot";
 
-const startBlock = 21038945
+const startBlock = LAST_REWARDS_BLOCK;
 // config
 export default createConfig({
   networks: {
@@ -29,12 +29,12 @@ export default createConfig({
     },
     IndexLPBalances: {
       network: "mainnet",
-      startBlock: 21031003,
+      startBlock: LAST_REWARDS_BLOCK,
       interval: 5, // every 5 blocks
     },
     ComputeRewards: {
       network: "mainnet",
-      startBlock: 21031003,
+      startBlock: LAST_REWARDS_BLOCK,
       interval: 1800, // every 6 hours
     }
     // SetRoot: {
