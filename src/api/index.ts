@@ -194,6 +194,8 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     medianLiquidity: medianLiquidityScaled,
     averageXp: totalXpScaled,
     totalXp: formatUnits(totalXp, 27),
+    averageLiquidity: totalLiquidityScaled,
+    averageXp: totalXpScaled,
     noteLiquidity: formatUnits(amountDeposited, 18),
     noteXp: formatUnits(xpAmount, 27),
     rewardRate: formatUnits(rewardRate, 18),
