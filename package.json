@@ -9,7 +9,8 @@
     "dev:nosnapshot": "ponder dev",
     "start": "pnpm generate-config && ponder start",
     "codegen": "ponder codegen",
-    "lint": "eslint .",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "typecheck": "tsc",
     "test": "vitest"
   },

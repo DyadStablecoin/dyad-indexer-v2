@@ -10,16 +10,16 @@ describe('Reward Calculation', () => {
     vi.mock('@/generated');
 
     const mockDbProcedures = {
-        findMany: vi.fn(),
-        create: vi.fn(),
-        createMany: vi.fn(),
-        update: vi.fn(),
-        updateMany: vi.fn(),
-        delete: vi.fn(),
-        deleteMany: vi.fn(),
-        upsert: vi.fn(),
-        findUnique: vi.fn(),
-    }
+      findMany: vi.fn(),
+      create: vi.fn(),
+      createMany: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+      upsert: vi.fn(),
+      findUnique: vi.fn(),
+    };
 
     const mockContext = {
       db: {
@@ -98,7 +98,7 @@ describe('Reward Calculation', () => {
 
     expect(noteRewards[1] / totalRewards).toBeCloseTo(0.2220735, 7);
     expect(noteRewards[2] / totalRewards).toBeCloseTo(0.1388566, 7);
-    expect(noteRewards[3] / totalRewards).toBeCloseTo(0.3807260, 7);
+    expect(noteRewards[3] / totalRewards).toBeCloseTo(0.380726, 7);
     expect(noteRewards[4] / totalRewards).toBeCloseTo(0.0997294, 7);
     expect(noteRewards[5] / totalRewards).toBeCloseTo(0.1586145, 7);
   });

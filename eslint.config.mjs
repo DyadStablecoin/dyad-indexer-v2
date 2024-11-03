@@ -1,8 +1,7 @@
-
 //import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths";
-import eslintPluginSimpleImportSort from "eslint-plugin-simple-import-sort";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   ...tseslint.configs.strict,
@@ -20,22 +19,22 @@ export default tseslint.config(
       },
     },
     plugins: {
-      "simple-import-sort": eslintPluginSimpleImportSort,
+      'simple-import-sort': eslintPluginSimpleImportSort,
       //"no-relative-import-paths": noRelativeImportPaths,
     },
     rules: {
-      "@typescript-eslint/no-namespace": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "warn", // or "error"
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn', // or "error"
         {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
-      "@typescript-eslint/no-floating-promises": "error",
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
       // "no-relative-import-paths/no-relative-import-paths": [
       //   "warn",
       //   {
@@ -46,9 +45,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: [
-      "node_modules/**",
-      "dist/**",
-    ],
-  }
+    ignores: ['node_modules/**', 'dist/**'],
+  },
 );
