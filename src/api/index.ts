@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
 
-import { ApiContext, ponder } from "@/generated";
+import { ApiContext, ponder, Schema } from "@/generated";
 
 import ponderConfig from "../../ponder.config";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
@@ -111,9 +111,13 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     .orderBy(desc(context.tables.Liquidity.timestamp))
     .limit(1);
 
-  const noteLiquidities = await context.db.select()
-    .from(context.tables.NoteLiquidity)
-    .where(eq(context.tables.NoteLiquidity.liquidityId, liquidity[0]!.id));
+  let noteLiquidities: Schema["NoteLiquidity"][] = [];
+
+  if (liquidity[0] !== undefined) {
+    noteLiquidities = await context.db.select()
+      .from(context.tables.NoteLiquidity)
+      .where(eq(context.tables.NoteLiquidity.liquidityId, liquidity[0].id));
+  }
 
   const publicClient = createPublicClient({
     chain: mainnet,
