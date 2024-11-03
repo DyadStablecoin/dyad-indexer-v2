@@ -1,4 +1,5 @@
 import { asc, desc, eq, graphql } from '@ponder/core';
+import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { createPublicClient, formatUnits, getAddress, parseEther } from 'viem';
 import { mainnet } from 'viem/chains';
@@ -26,6 +27,7 @@ interface YieldReturnType {
   kerosenePerYear: string;
 }
 
+ponder.use(cors({ origin: '*', maxAge: 86400 }));
 ponder.use('/', graphql());
 ponder.use('/graphql', graphql());
 ponder.get('/api/rewards/:id', async (context) => {
