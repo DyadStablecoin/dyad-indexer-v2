@@ -27,7 +27,6 @@ interface YieldReturnType {
   kerosenePerYear: string;
 }
 
-ponder.use(cors({ origin: '*', maxAge: 86400 }));
 ponder.use('/', graphql());
 ponder.use('/graphql', graphql());
 ponder.get('/api/rewards/:id', async (context) => {
