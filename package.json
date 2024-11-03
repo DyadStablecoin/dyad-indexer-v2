@@ -38,6 +38,8 @@
     "vitest": "^2.1.1"
   },
   "engines": {
-    "node": ">=18.14"
-  }
+    "node": ">=18.14",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.3"
 }

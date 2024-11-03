@@ -1,6 +1,5 @@
 //import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths";
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
-import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -9,7 +8,6 @@ export default tseslint.config(
   ...tseslint.configs.recommendedTypeChecked,
   {
     languageOptions: {
-      globals: globals.node,
       parserOptions: {
         projectService: true,
         projectService: {
