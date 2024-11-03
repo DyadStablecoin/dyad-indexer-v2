@@ -3,7 +3,7 @@ import { Block } from "@ponder/core";
 import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
 import { mainnet } from "viem/chains";
 
-import { Context } from "@/generated";
+import { Context, Schema } from "@/generated";
 
 import ponderConfig from "../ponder.config";
 import { buildMerkleTree } from "./buildMerkleTree";
@@ -165,7 +165,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
 
     let cursor: string | undefined = undefined;
     let hasNextPage = false;
-    const allRewards: any[] = [];
+    const allRewards: Schema["TotalReward"][] = [];
     do {
         const rewards = await TotalReward.findMany({ 
             after: cursor,
@@ -210,7 +210,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         return {};
     }
 
-    const noteLiquidityItems: any[] = [];
+    const noteLiquidityItems: Schema["NoteLiquidity"][]= [];
     cursor = undefined;
     hasNextPage = false;
     do {
@@ -246,8 +246,8 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
             participants[noteId] = { liquidity: 0n, xp: 0n };
             numberOfParticipants++;
         }
-        participants[noteId]!.liquidity += note.liquidity;
-        participants[noteId]!.xp += note.xp;
+        participants[noteId].liquidity += note.liquidity;
+        participants[noteId].xp += note.xp;
     }
 
     const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
