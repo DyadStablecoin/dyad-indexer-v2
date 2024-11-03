@@ -3,7 +3,7 @@ import { Block } from "@ponder/core";
 import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
 import { mainnet } from "viem/chains";
 
-import { Context } from "@/generated";
+import { Context, Schema } from "@/generated";
 
 import ponderConfig from "../ponder.config";
 import { buildMerkleTree } from "./buildMerkleTree";
@@ -39,9 +39,7 @@ export async function handleComputeRewards({ event, context }: { event: {
 
         let lastToBlock = toBlock;
 
-        for (let i = 0; i < rewardRate.items.length; i++) {
-            const rate = rewardRate.items[i]!;
-
+        for (const rate of rewardRate.items) {
             if (rate.rate === 0n) {
                 continue;
             }
@@ -138,9 +136,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
             where: {
                 noteId: BigInt(i),
                 toBlockNumber: {
-                    // use gte here because the last updated reward
-                    // does not include the rewards computed in that block
-                    gte: lastTotalReward?.lastUpdated
+                    gt: lastTotalReward?.lastUpdated ?? 0n
                 }
             }
         });
@@ -172,7 +168,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
 
     let cursor: string | undefined = undefined;
     let hasNextPage = false;
-    const allRewards: any[] = [];
+    const allRewards: Schema["TotalReward"][] = [];
     do {
         const rewards = await TotalReward.findMany({ 
             after: cursor,
@@ -217,7 +213,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         return {};
     }
 
-    const noteLiquidityItems: any[] = [];
+    const noteLiquidityItems: Schema["NoteLiquidity"][]= [];
     cursor = undefined;
     hasNextPage = false;
     do {
@@ -252,8 +248,8 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
             participants[noteId] = { liquidity: 0n, xp: 0n };
             numberOfParticipants++;
         }
-        participants[noteId]!.liquidity += note.liquidity;
-        participants[noteId]!.xp += note.xp;
+        participants[noteId].liquidity += note.liquidity;
+        participants[noteId].xp += note.xp;
         lpSizes.push(note.liquidity);
     }
 
