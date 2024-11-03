@@ -16,11 +16,11 @@ jobs:
       - name: Read .nvmrc
         run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
         id: nvm
-        
+
       - name: Use Node.js (.nvmrc)
         uses: actions/setup-node@v1
         with:
-            node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.0.0
