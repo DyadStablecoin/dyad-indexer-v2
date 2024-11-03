@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { createPublicClient, formatUnits, getAddress, parseEther } from "viem";
 import { mainnet } from "viem/chains";
 
-import { ApiContext, ponder } from "@/generated";
+import { ApiContext, ponder, Schema } from "@/generated";
 
 import ponderConfig from "../../ponder.config";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
@@ -15,7 +15,7 @@ interface YieldReturnType {
   lpToken: string;
   totalLiquidity: string;
   totalXp: string;
-  averageLiquidity: number;
+  medianLiquidity: number;
   averageXp: number;
   noteLiquidity: string;
   noteXp: string;
@@ -194,8 +194,6 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     medianLiquidity: medianLiquidityScaled,
     averageXp: totalXpScaled,
     totalXp: formatUnits(totalXp, 27),
-    averageLiquidity: totalLiquidityScaled,
-    averageXp: totalXpScaled,
     noteLiquidity: formatUnits(amountDeposited, 18),
     noteXp: formatUnits(xpAmount, 27),
     rewardRate: formatUnits(rewardRate, 18),

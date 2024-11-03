@@ -244,12 +244,18 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
     for (const note of noteLiquidityItems) {
         const noteId = Number(note.noteId);
         totalXpInPeriod += note.xp;
-        if (!participants[noteId]) {
-            participants[noteId] = { liquidity: 0n, xp: 0n };
+        let participant = participants[noteId];
+        if (participant === undefined) {
+            participant = {
+                liquidity: 0n,
+                xp: 0n
+            };
             numberOfParticipants++;
         }
-        participants[noteId].liquidity += note.liquidity;
-        participants[noteId].xp += note.xp;
+        participant.liquidity += note.liquidity;
+        participant.xp += note.xp;
+        participants[noteId] = participant;
+        
         lpSizes.push(note.liquidity);
     }
 
