@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "generate-config": "npx tsx generate-config.ts",
-    "dev": "yarn generate-config && ponder dev",
+    "dev": "pnpm generate-config && ponder dev",
     "dev:nosnapshot": "ponder dev",
-    "start": "yarn generate-config && ponder start",
+    "start": "pnpm generate-config && ponder start",
     "codegen": "ponder codegen",
     "lint": "eslint .",
     "typecheck": "tsc",
