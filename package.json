@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ponder dev",
-    "start": "ponder start",
+    "generate-config": "npx tsx generate-config.ts",
+    "dev": "yarn generate-config && ponder dev",
+    "dev:nosnapshot": "ponder dev",
+    "start": "yarn generate-config && ponder start",
     "codegen": "ponder codegen",
     "lint": "eslint .",
     "typecheck": "tsc",
@@ -16,14 +18,23 @@
     "@ponder/core": "^0.6",
     "hono": "^4.6.7",
     "merkletreejs": "^0.4.0",
+    "npx": "^10.2.2",
     "viem": "^2.21.35"
   },
   "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/node": "^20.9.0",
-    "eslint": "^8.53.0",
+    "eslint": "^9.14.0",
     "eslint-config-ponder": "^0.6",
-    "vitest": "^2.1.1",
-    "typescript": "^5.2.2"
+    "eslint-plugin-no-relative-import-paths": "^1.5.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.3.3",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.2.2",
+    "typescript-eslint": "^8.12.2",
+    "vitest": "^2.1.1"
   },
   "engines": {
     "node": ">=18.14"

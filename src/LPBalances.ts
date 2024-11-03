@@ -1,5 +1,7 @@
-import { ponder } from "@/generated";
 import { Address, encodeAbiParameters, keccak256 } from "viem";
+
+import { ponder } from "@/generated";
+
 import config from "../ponder.config";
 
 ponder.on("LPStakingFactory:PoolStakingCreated", async ({ event, context }) => {
@@ -40,7 +42,7 @@ ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
     }
   });
 
-  if (pools.items.length !== 1) {
+  if (pools.items[0] === undefined) {
     return;
   }
 
@@ -50,7 +52,7 @@ ponder.on("LPStakingFactory:RewardRateSet", async ({ event, context }) => {
       { type: "uint256" },
     ], [event.args.lpToken, event.block.number])),
     data: {
-      pool: pools.items[0]!.id,
+      pool: pools.items[0].id,
       blockNumber: event.block.number,
       timestamp: event.block.timestamp,
       rate: event.args.newRewardRate,

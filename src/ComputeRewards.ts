@@ -1,11 +1,13 @@
-import { Context } from "@/generated";
-import ponderConfig from "../ponder.config";
-import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
 import { Defender } from "@openzeppelin/defender-sdk";
-import { mainnet } from "viem/chains";
-import { buildMerkleTree } from "./buildMerkleTree";
-import { XP_TANH_FACTOR, LP_TANH_FACTOR, BLOCK_TIME } from "./constants";
 import { Block } from "@ponder/core";
+import { Address, createPublicClient, encodeAbiParameters, encodeFunctionData, formatEther, formatUnits, Hex, keccak256, parseEther, Prettify } from "viem";
+import { mainnet } from "viem/chains";
+
+import { Context, Schema } from "@/generated";
+
+import ponderConfig from "../ponder.config";
+import { buildMerkleTree } from "./buildMerkleTree";
+import { BLOCK_TIME,LP_TANH_FACTOR, XP_TANH_FACTOR } from "./constants";
 
 export async function handleComputeRewards({ event, context }: { event: {
     block: Prettify<Block>;
@@ -34,14 +36,12 @@ export async function handleComputeRewards({ event, context }: { event: {
 
         let lastToBlock = toBlock;
 
-        for (let i = 0; i < rewardRate.items.length; i++) {
-            const rate = rewardRate.items[i]!;
-
+        for (const rate of rewardRate.items) {
             if (rate.rate === 0n) {
                 continue;
             }
 
-            let thisFromBlock = BigInt(Math.max(Number(fromBlock), Number(rate.blockNumber)));
+            const thisFromBlock = BigInt(Math.max(Number(fromBlock), Number(rate.blockNumber)));
 
             const rewardsForPeriod = await computeRewardsForPeriod(
                 rate.rate, 
@@ -125,13 +125,21 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     });
 
     for (let i = 0; i < dnftSupply; i++) {
+        const lastTotalReward = await TotalReward.findUnique({
+            id: BigInt(i)
+        });
+
         const rewards = await Reward.findMany({
             where: {
-                noteId: BigInt(i)
+                noteId: BigInt(i),
+                toBlockNumber: {
+                    gt: lastTotalReward?.lastUpdated ?? 0n
+                }
             }
         });
 
-        const totalReward = rewards.items.reduce((acc, curr) => acc + curr.amount, 0n);
+        const lastTotalRewardAmount = lastTotalReward?.amount ?? 0n;
+        const totalReward = lastTotalRewardAmount + rewards.items.reduce((acc, curr) => acc + curr.amount, 0n);
 
         if (totalReward === 0n) {
             continue;
@@ -157,7 +165,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
 
     let cursor: string | undefined = undefined;
     let hasNextPage = false;
-    const allRewards: any[] = [];
+    const allRewards: Schema["TotalReward"][] = [];
     do {
         const rewards = await TotalReward.findMany({ 
             after: cursor,
@@ -202,7 +210,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         return {};
     }
 
-    const noteLiquidityItems: any[] = [];
+    const noteLiquidityItems: Schema["NoteLiquidity"][]= [];
     cursor = undefined;
     hasNextPage = false;
     do {
@@ -228,7 +236,7 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
     let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
     let numberOfParticipants = 0;
-    let participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
+    const participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
 
     for (const note of noteLiquidityItems) {
         const noteId = Number(note.noteId);
@@ -238,15 +246,15 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
             participants[noteId] = { liquidity: 0n, xp: 0n };
             numberOfParticipants++;
         }
-        participants[noteId]!.liquidity += note.liquidity;
-        participants[noteId]!.xp += note.xp;
+        participants[noteId].liquidity += note.liquidity;
+        participants[noteId].xp += note.xp;
     }
 
     const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
     const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod / BigInt(totalSnapshotsInPeriod), 18)) / numberOfParticipants;
 
     let totalSize = 0;
-    let scaledSizeByNoteId: Record<number, number> = {};
+    const scaledSizeByNoteId: Record<number, number> = {};
 
     for (const [noteId, participant] of Object.entries(participants)) {
         const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
