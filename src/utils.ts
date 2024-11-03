@@ -6,5 +6,9 @@ export function median(values: number[]): number {
 
     values.sort((a, b) => a - b);
     const mid = Math.floor(values.length / 2);
+    
+    // we know that the indexes are valid here because we checked the length above
+    // and the midpoint is computed from the array length
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return values.length % 2 !== 0 ? values[mid]! : (values[mid - 1]! + values[mid]!) / 2;
 }
