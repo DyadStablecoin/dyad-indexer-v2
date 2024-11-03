@@ -9,6 +9,21 @@ import ponderConfig from "../../ponder.config";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
 import { LP_TANH_FACTOR, XP_TANH_FACTOR } from "../constants";
 
+interface YieldReturnType {
+  lpToken: string;
+  totalLiquidity: string;
+  totalXp: string;
+  averageLiquidity: number;
+  averageXp: number;
+  noteLiquidity: string;
+  noteXp: string;
+  rewardRate: string;
+  effectiveSize: number;
+  totalEffectiveSize: number;
+  maxEffectiveSize: number;
+  kerosenePerYear: string;
+}
+
 ponder.use("/", graphql());
 ponder.use("/graphql", graphql());
 ponder.get("/api/rewards/:id", async (context) => {
@@ -25,7 +40,7 @@ ponder.get("/api/rewards/:id", async (context) => {
   const tree = buildMerkleTree(allRewards);
   const root = tree.getHexRoot();
 
-  if (noteRewards.length === 0) {
+  if (noteRewards[0] === undefined) {
     return context.json({
       amount: "0",
       //leaf: "0x",
@@ -34,11 +49,11 @@ ponder.get("/api/rewards/:id", async (context) => {
     });
   }
 
-  const leaf = getLeaf(noteRewards[0]!);
+  const leaf = getLeaf(noteRewards[0]);
   const proof = tree.getHexProof(leaf);
 
   return context.json({
-    amount: noteRewards[0]!.amount.toString(),
+    amount: noteRewards[0].amount.toString(),
     //leaf,
     proof,
     root
@@ -63,18 +78,18 @@ ponder.get("/api/yield", async (context) => {
     .where(eq(context.tables.Pool.lpToken, lpToken))
     .limit(1);
 
-  if (pool.length === 0) {
+  if (pool[0] === undefined) {
     throw new HTTPException(400, { message: "Pool not found" });
   }
 
-  const result = await getYieldsForPool(pool[0]!, noteId, context);
+  const result = await getYieldsForPool(pool[0], noteId, context);
 
   return context.json(result);
 });
 ponder.get("/api/yields/:id", async (context) => {
   const id = context.req.param("id");
 
-  const results: Record<string, any> = {};
+  const results: Record<string, YieldReturnType> = {};
 
   const noteId = BigInt(id);
 
