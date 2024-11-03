@@ -1,16 +1,23 @@
-import eslint from "@eslint/js";
+
 //import noRelativeImportPaths from "eslint-plugin-no-relative-import-paths";
 import eslintPluginSimpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  eslint.configs.recommended,
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
+  ...tseslint.configs.recommendedTypeChecked,
   {
     languageOptions: {
       globals: globals.node,
+      parserOptions: {
+        projectService: true,
+        projectService: {
+          allowDefaultProject: ['*.js', '*.mjs'],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       "simple-import-sort": eslintPluginSimpleImportSort,
@@ -28,6 +35,7 @@ export default tseslint.config(
       ],
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
+      "@typescript-eslint/no-floating-promises": "error",
       // "no-relative-import-paths/no-relative-import-paths": [
       //   "warn",
       //   {
