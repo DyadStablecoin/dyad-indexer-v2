@@ -5,13 +5,30 @@ import path from "path";
 
 import { buildMerkleTree } from "./src/buildMerkleTree";
 
+interface RewardsItem {
+    id: string;
+    amount: string;
+    lastUpdated: string;
+}
+interface RewardsResponse {
+    data: {
+        totalRewards: {
+            items: RewardsItem[];
+            pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+            };
+        };
+    };
+}
+
 async function main() {
 
     const syncUrl = "api.dyadstable.xyz";
 
     console.log("Generating rewards snapshot...");
 
-    const allItems: any[] = [];
+    const allItems: RewardsItem[] = [];
     let cursor: string | undefined = undefined;
     let hasNextPage = false
     do {
@@ -35,7 +52,7 @@ async function main() {
                     }
                 }`
         });
-        const data = await response.json() as any;
+        const data = await response.json() as RewardsResponse;
         hasNextPage = data.data.totalRewards.pageInfo.hasNextPage;
         cursor = data.data.totalRewards.pageInfo.endCursor;
         allItems.push(...data.data.totalRewards.items);
@@ -55,7 +72,11 @@ export const REWARDS = ${JSON.stringify(allItems, null, 2)};`)
     console.log("Last block: ", lastBlock);
     console.log("Notes with rewards: ", allItems.length);
 
-    const merkleTree = buildMerkleTree(allItems);
+    const merkleTree = buildMerkleTree(allItems.map((item) => ({
+        id: BigInt(item.id),
+        amount: BigInt(item.amount),
+        lastUpdated: BigInt(item.lastUpdated),
+    })));
     console.log("Merkle root: ", merkleTree.getHexRoot());
 }
 

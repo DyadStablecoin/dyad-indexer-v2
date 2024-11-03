@@ -7,13 +7,15 @@ import { ApiContext, ponder, Schema } from "@/generated";
 
 import ponderConfig from "../../ponder.config";
 import { buildMerkleTree, getLeaf } from "../buildMerkleTree";
-import { LP_TANH_FACTOR, XP_TANH_FACTOR } from "../constants";
+import { computeBoostedSize } from "../computeBoostedSize";
+import { LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from "../constants";
+import { median } from "../utils";
 
 interface YieldReturnType {
   lpToken: string;
   totalLiquidity: string;
   totalXp: string;
-  averageLiquidity: number;
+  medianLiquidity: number;
   averageXp: number;
   noteLiquidity: string;
   noteXp: string;
@@ -151,6 +153,7 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
   const [amountDeposited, xpAmount, rewardRate] = balances;
 
   let totalLiquidity = amountDeposited;
+  const lpSizes = [amountDeposited]
   let totalXp = xpAmount;
   let totalParticipants = noteLiquidities.length + 1; // +1 for current note
   for (const noteLiquidity of noteLiquidities) {
@@ -160,15 +163,16 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
       totalParticipants--;
       continue;
     } else {
+      lpSizes.push(noteLiquidity.liquidity);
       totalLiquidity += noteLiquidity.liquidity;
       totalXp += noteLiquidity.xp;
     }
   }
 
   const totalXpScaled = Number(formatUnits(totalXp, 27)) / totalParticipants;
-  const totalLiquidityScaled = Number(formatUnits(totalLiquidity, 18)) / totalParticipants;
+  const medianLiquidityScaled = median(lpSizes.map(n => Number(formatUnits(n, 18))));
 
-  const noteBoostedSize = computeBoostedSize(xpAmount, amountDeposited, totalXpScaled, totalLiquidityScaled);
+  const noteBoostedSize = computeBoostedSize(xpAmount, amountDeposited, totalXpScaled, medianLiquidityScaled);
   let totalEffectiveSize = noteBoostedSize;
 
   for (const noteLiquidity of noteLiquidities) {
@@ -176,7 +180,7 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
       continue;
     }
 
-    const boostedSize = computeBoostedSize(noteLiquidity.xp, noteLiquidity.liquidity, totalXpScaled, totalLiquidityScaled);
+    const boostedSize = computeBoostedSize(noteLiquidity.xp, noteLiquidity.liquidity, totalXpScaled, medianLiquidityScaled);
     totalEffectiveSize += boostedSize;
   }
 
@@ -187,6 +191,8 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
   return {
     lpToken: pool.lpToken,
     totalLiquidity: formatUnits(totalLiquidity, 18),
+    medianLiquidity: medianLiquidityScaled,
+    averageXp: totalXpScaled,
     totalXp: formatUnits(totalXp, 27),
     averageLiquidity: totalLiquidityScaled,
     averageXp: totalXpScaled,
@@ -195,19 +201,7 @@ async function getYieldsForPool(pool: { id: string, lpToken: string }, noteId: b
     rewardRate: formatUnits(rewardRate, 18),
     effectiveSize: noteBoostedSize,
     totalEffectiveSize,
-    maxEffectiveSize: LP_TANH_FACTOR * XP_TANH_FACTOR,
+    maxEffectiveSize: LP_TANH_FACTOR * (XP_BASE_FACTOR + XP_TANH_FACTOR),
     kerosenePerYear: formatUnits(rewardPerYear, 18),
   }
-}
-
-function computeBoostedSize(xp: bigint, liquidity: bigint, totalXpScaled: number, totalLiquidityScaled: number) {
-  const scaledXp = Number(formatUnits(xp, 27));
-  const scaledLiquidity = Number(formatUnits(liquidity, 18));
-
-  const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
-  const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
-
-  const boostedSize = tanhXP * tanhLP;
-
-  return boostedSize;
 }

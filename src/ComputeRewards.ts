@@ -7,7 +7,10 @@ import { Context, Schema } from "@/generated";
 
 import ponderConfig from "../ponder.config";
 import { buildMerkleTree } from "./buildMerkleTree";
-import { BLOCK_TIME,LP_TANH_FACTOR, XP_TANH_FACTOR } from "./constants";
+import { computeBoostedSize } from "./computeBoostedSize";
+import { config } from "./config";
+import { BLOCK_TIME } from "./constants";
+import { median } from "./utils";
 
 export async function handleComputeRewards({ event, context }: { event: {
     block: Prettify<Block>;
@@ -48,7 +51,7 @@ export async function handleComputeRewards({ event, context }: { event: {
                 pool.id as Address, 
                 BigInt(thisFromBlock), 
                 BigInt(lastToBlock), 
-                context);
+                context.db);
 
             await Reward.createMany({
                 data: Object.entries(rewardsForPeriod).map(([noteId, rewards]) => ({
@@ -92,13 +95,13 @@ export async function handleComputeRewards({ event, context }: { event: {
     });
 
     if (lastOnchainUpdateBlock < toBlock 
-        && process.env.RELAY_API_KEY 
-        && process.env.RELAY_API_SECRET
-        && process.env.RAILWAY_ENVIRONMENT_NAME === "production") {
+        && config.relayApiKey
+        && config.relayApiSecret
+        && config.railwayEnvironmentName === "production") {
         console.log("Setting root onchain", toBlock);
         const defender = new Defender({
-            relayerApiKey: process.env.RELAY_API_KEY,
-            relayerApiSecret: process.env.RELAY_API_SECRET,
+            relayerApiKey: config.relayApiKey,
+            relayerApiSecret: config.relayApiSecret,
         });
 
         await defender.relaySigner.sendTransaction({
@@ -181,8 +184,8 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
     return tree.getHexRoot();
 }
 
-export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, context: Context) {
-    const { Liquidity, NoteLiquidity } = context.db;
+export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address, fromBlock: bigint, toBlock: bigint, db: Pick<Context['db'], 'Liquidity' | 'NoteLiquidity'>) {
+    const { Liquidity, NoteLiquidity } = db;
 
     const liquidityItems = [];
 
@@ -233,37 +236,41 @@ export async function computeRewardsForPeriod(rewardRate: bigint, pool: Address,
         cursor = noteLiquidity.pageInfo.endCursor ?? undefined;
     } while (hasNextPage)
 
-    let totalLiquidityInPeriod = 0n;
     let totalXpInPeriod = 0n;
     let numberOfParticipants = 0;
     const participants: Record<number, { liquidity: bigint, xp: bigint }> = {};
+    const lpSizes: bigint[] = [];
 
     for (const note of noteLiquidityItems) {
         const noteId = Number(note.noteId);
-        totalLiquidityInPeriod += note.liquidity;
         totalXpInPeriod += note.xp;
-        if (!participants[noteId]) {
-            participants[noteId] = { liquidity: 0n, xp: 0n };
+        let participant = participants[noteId];
+        if (participant === undefined) {
+            participant = {
+                liquidity: 0n,
+                xp: 0n
+            };
             numberOfParticipants++;
         }
-        participants[noteId].liquidity += note.liquidity;
-        participants[noteId].xp += note.xp;
+        participant.liquidity += note.liquidity;
+        participant.xp += note.xp;
+        participants[noteId] = participant;
+        
+        lpSizes.push(note.liquidity);
     }
 
-    const totalXpScaled = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
-    const totalLiquidityScaled = Number(formatUnits(totalLiquidityInPeriod / BigInt(totalSnapshotsInPeriod), 18)) / numberOfParticipants;
+    const averageXpAcrossPeriod = Number(formatUnits(totalXpInPeriod / BigInt(totalSnapshotsInPeriod), 27)) / numberOfParticipants;
+    const medianLiquidityScaled = median(lpSizes.map(n => Number(formatUnits(n, 18))));
 
     let totalSize = 0;
     const scaledSizeByNoteId: Record<number, number> = {};
 
-    for (const [noteId, participant] of Object.entries(participants)) {
-        const scaledXp = Number(formatUnits(participant.xp / BigInt(totalSnapshotsInPeriod), 27));
-        const scaledLiquidity = Number(formatUnits(participant.liquidity / BigInt(totalSnapshotsInPeriod), 18));
+    for (const [noteId, participant] of Object.entries(participants)) {        
+        const participantAvgXpAcrossPeriod = participant.xp / BigInt(totalSnapshotsInPeriod);
+        const participantAvgLiquidityAcrossPeriod = participant.liquidity / BigInt(totalSnapshotsInPeriod);
 
-        const tanhXP = XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled)
-        const tanhLP = LP_TANH_FACTOR * Math.tanh(scaledLiquidity / totalLiquidityScaled);
+        const boostedSize = computeBoostedSize(participantAvgXpAcrossPeriod, participantAvgLiquidityAcrossPeriod, averageXpAcrossPeriod, medianLiquidityScaled);
 
-        const boostedSize = tanhXP * tanhLP;
         totalSize += boostedSize;
         scaledSizeByNoteId[Number(noteId)] = boostedSize;
     }
