@@ -36,9 +36,7 @@ export async function handleComputeRewards({ event, context }: { event: {
 
         let lastToBlock = toBlock;
 
-        for (let i = 0; i < rewardRate.items.length; i++) {
-            const rate = rewardRate.items[i]!;
-
+        for (const rate of rewardRate.items) {
             if (rate.rate === 0n) {
                 continue;
             }
@@ -135,9 +133,7 @@ async function computeTotalRewards(blockNumber: bigint, context: Context) {
             where: {
                 noteId: BigInt(i),
                 toBlockNumber: {
-                    // use gte here because the last updated reward
-                    // does not include the rewards computed in that block
-                    gte: lastTotalReward?.lastUpdated
+                    gt: lastTotalReward?.lastUpdated ?? 0n
                 }
             }
         });
