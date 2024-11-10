@@ -28,9 +28,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate config file
-        run: pnpm generate-config
-
       - name: Lint
         run: pnpm lint
 

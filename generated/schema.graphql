@@ -1,0 +1,544 @@
+type Query {
+  note(id: BigInt!): Note
+  notes(where: NoteFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): NotePage!
+  tvl(id: BigInt!): Tvl
+  tvls(where: TvlFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): TvlPage!
+  noteLiquidity(id: String!): NoteLiquidity
+  noteLiquiditys(where: NoteLiquidityFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): NoteLiquidityPage!
+  liquidity(id: String!): Liquidity
+  liquiditys(where: LiquidityFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): LiquidityPage!
+  pool(id: String!): Pool
+  pools(where: PoolFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): PoolPage!
+  rewardRate(id: String!): RewardRate
+  rewardRates(where: RewardRateFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): RewardRatePage!
+  reward(id: String!): Reward
+  rewards(where: RewardFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): RewardPage!
+  totalReward(id: BigInt!): TotalReward
+  totalRewards(where: TotalRewardFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): TotalRewardPage!
+  _meta: _meta
+}
+
+type Note {
+  id: BigInt!
+  collatRatio: BigInt
+  kerosene: BigInt
+  dyad: BigInt
+  xp: BigInt
+  collateral: BigInt
+  lastLiquidation: BigInt
+  exoCollateral: BigInt
+}
+
+scalar BigInt
+
+type NotePage {
+  items: [Note!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+input NoteFilter {
+  AND: [NoteFilter]
+  OR: [NoteFilter]
+  id: BigInt
+  id_not: BigInt
+  id_in: [BigInt]
+  id_not_in: [BigInt]
+  id_gt: BigInt
+  id_lt: BigInt
+  id_gte: BigInt
+  id_lte: BigInt
+  collatRatio: BigInt
+  collatRatio_not: BigInt
+  collatRatio_in: [BigInt]
+  collatRatio_not_in: [BigInt]
+  collatRatio_gt: BigInt
+  collatRatio_lt: BigInt
+  collatRatio_gte: BigInt
+  collatRatio_lte: BigInt
+  kerosene: BigInt
+  kerosene_not: BigInt
+  kerosene_in: [BigInt]
+  kerosene_not_in: [BigInt]
+  kerosene_gt: BigInt
+  kerosene_lt: BigInt
+  kerosene_gte: BigInt
+  kerosene_lte: BigInt
+  dyad: BigInt
+  dyad_not: BigInt
+  dyad_in: [BigInt]
+  dyad_not_in: [BigInt]
+  dyad_gt: BigInt
+  dyad_lt: BigInt
+  dyad_gte: BigInt
+  dyad_lte: BigInt
+  xp: BigInt
+  xp_not: BigInt
+  xp_in: [BigInt]
+  xp_not_in: [BigInt]
+  xp_gt: BigInt
+  xp_lt: BigInt
+  xp_gte: BigInt
+  xp_lte: BigInt
+  collateral: BigInt
+  collateral_not: BigInt
+  collateral_in: [BigInt]
+  collateral_not_in: [BigInt]
+  collateral_gt: BigInt
+  collateral_lt: BigInt
+  collateral_gte: BigInt
+  collateral_lte: BigInt
+  lastLiquidation: BigInt
+  lastLiquidation_not: BigInt
+  lastLiquidation_in: [BigInt]
+  lastLiquidation_not_in: [BigInt]
+  lastLiquidation_gt: BigInt
+  lastLiquidation_lt: BigInt
+  lastLiquidation_gte: BigInt
+  lastLiquidation_lte: BigInt
+  exoCollateral: BigInt
+  exoCollateral_not: BigInt
+  exoCollateral_in: [BigInt]
+  exoCollateral_not_in: [BigInt]
+  exoCollateral_gt: BigInt
+  exoCollateral_lt: BigInt
+  exoCollateral_gte: BigInt
+  exoCollateral_lte: BigInt
+}
+
+type Tvl {
+  id: BigInt!
+  tvl: BigInt!
+  timestamp: BigInt!
+}
+
+type TvlPage {
+  items: [Tvl!]!
+  pageInfo: PageInfo!
+}
+
+input TvlFilter {
+  AND: [TvlFilter]
+  OR: [TvlFilter]
+  id: BigInt
+  id_not: BigInt
+  id_in: [BigInt]
+  id_not_in: [BigInt]
+  id_gt: BigInt
+  id_lt: BigInt
+  id_gte: BigInt
+  id_lte: BigInt
+  tvl: BigInt
+  tvl_not: BigInt
+  tvl_in: [BigInt]
+  tvl_not_in: [BigInt]
+  tvl_gt: BigInt
+  tvl_lt: BigInt
+  tvl_gte: BigInt
+  tvl_lte: BigInt
+  timestamp: BigInt
+  timestamp_not: BigInt
+  timestamp_in: [BigInt]
+  timestamp_not_in: [BigInt]
+  timestamp_gt: BigInt
+  timestamp_lt: BigInt
+  timestamp_gte: BigInt
+  timestamp_lte: BigInt
+}
+
+type NoteLiquidity {
+  id: String!
+  liquidityId: String!
+  pool: String!
+  noteId: BigInt!
+  blockNumber: BigInt!
+  liquidity: BigInt!
+  xp: BigInt!
+  timestamp: BigInt!
+}
+
+type NoteLiquidityPage {
+  items: [NoteLiquidity!]!
+  pageInfo: PageInfo!
+}
+
+input NoteLiquidityFilter {
+  AND: [NoteLiquidityFilter]
+  OR: [NoteLiquidityFilter]
+  id: String
+  id_not: String
+  id_in: [String]
+  id_not_in: [String]
+  id_contains: String
+  id_not_contains: String
+  id_starts_with: String
+  id_ends_with: String
+  id_not_starts_with: String
+  id_not_ends_with: String
+  liquidityId: String
+  liquidityId_not: String
+  liquidityId_in: [String]
+  liquidityId_not_in: [String]
+  liquidityId_contains: String
+  liquidityId_not_contains: String
+  liquidityId_starts_with: String
+  liquidityId_ends_with: String
+  liquidityId_not_starts_with: String
+  liquidityId_not_ends_with: String
+  pool: String
+  pool_not: String
+  pool_in: [String]
+  pool_not_in: [String]
+  pool_contains: String
+  pool_not_contains: String
+  pool_starts_with: String
+  pool_ends_with: String
+  pool_not_starts_with: String
+  pool_not_ends_with: String
+  noteId: BigInt
+  noteId_not: BigInt
+  noteId_in: [BigInt]
+  noteId_not_in: [BigInt]
+  noteId_gt: BigInt
+  noteId_lt: BigInt
+  noteId_gte: BigInt
+  noteId_lte: BigInt
+  blockNumber: BigInt
+  blockNumber_not: BigInt
+  blockNumber_in: [BigInt]
+  blockNumber_not_in: [BigInt]
+  blockNumber_gt: BigInt
+  blockNumber_lt: BigInt
+  blockNumber_gte: BigInt
+  blockNumber_lte: BigInt
+  liquidity: BigInt
+  liquidity_not: BigInt
+  liquidity_in: [BigInt]
+  liquidity_not_in: [BigInt]
+  liquidity_gt: BigInt
+  liquidity_lt: BigInt
+  liquidity_gte: BigInt
+  liquidity_lte: BigInt
+  xp: BigInt
+  xp_not: BigInt
+  xp_in: [BigInt]
+  xp_not_in: [BigInt]
+  xp_gt: BigInt
+  xp_lt: BigInt
+  xp_gte: BigInt
+  xp_lte: BigInt
+  timestamp: BigInt
+  timestamp_not: BigInt
+  timestamp_in: [BigInt]
+  timestamp_not_in: [BigInt]
+  timestamp_gt: BigInt
+  timestamp_lt: BigInt
+  timestamp_gte: BigInt
+  timestamp_lte: BigInt
+}
+
+type Liquidity {
+  id: String!
+  blockNumber: BigInt!
+  pool: String!
+  totalLiquidity: BigInt!
+  totalXp: BigInt!
+  timestamp: BigInt!
+  notes(where: NoteLiquidityFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): NoteLiquidityPage
+}
+
+type LiquidityPage {
+  items: [Liquidity!]!
+  pageInfo: PageInfo!
+}
+
+input LiquidityFilter {
+  AND: [LiquidityFilter]
+  OR: [LiquidityFilter]
+  id: String
+  id_not: String
+  id_in: [String]
+  id_not_in: [String]
+  id_contains: String
+  id_not_contains: String
+  id_starts_with: String
+  id_ends_with: String
+  id_not_starts_with: String
+  id_not_ends_with: String
+  blockNumber: BigInt
+  blockNumber_not: BigInt
+  blockNumber_in: [BigInt]
+  blockNumber_not_in: [BigInt]
+  blockNumber_gt: BigInt
+  blockNumber_lt: BigInt
+  blockNumber_gte: BigInt
+  blockNumber_lte: BigInt
+  pool: String
+  pool_not: String
+  pool_in: [String]
+  pool_not_in: [String]
+  pool_contains: String
+  pool_not_contains: String
+  pool_starts_with: String
+  pool_ends_with: String
+  pool_not_starts_with: String
+  pool_not_ends_with: String
+  totalLiquidity: BigInt
+  totalLiquidity_not: BigInt
+  totalLiquidity_in: [BigInt]
+  totalLiquidity_not_in: [BigInt]
+  totalLiquidity_gt: BigInt
+  totalLiquidity_lt: BigInt
+  totalLiquidity_gte: BigInt
+  totalLiquidity_lte: BigInt
+  totalXp: BigInt
+  totalXp_not: BigInt
+  totalXp_in: [BigInt]
+  totalXp_not_in: [BigInt]
+  totalXp_gt: BigInt
+  totalXp_lt: BigInt
+  totalXp_gte: BigInt
+  totalXp_lte: BigInt
+  timestamp: BigInt
+  timestamp_not: BigInt
+  timestamp_in: [BigInt]
+  timestamp_not_in: [BigInt]
+  timestamp_gt: BigInt
+  timestamp_lt: BigInt
+  timestamp_gte: BigInt
+  timestamp_lte: BigInt
+}
+
+type Pool {
+  id: String!
+  lpToken: String!
+  liquidity(where: LiquidityFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): LiquidityPage
+  rewardRates(where: RewardRateFilter, orderBy: String, orderDirection: String, before: String, after: String, limit: Int): RewardRatePage
+}
+
+type RewardRatePage {
+  items: [RewardRate!]!
+  pageInfo: PageInfo!
+}
+
+type RewardRate {
+  id: String!
+  pool: String!
+  blockNumber: BigInt!
+  rate: BigInt!
+  timestamp: BigInt!
+}
+
+input RewardRateFilter {
+  AND: [RewardRateFilter]
+  OR: [RewardRateFilter]
+  id: String
+  id_not: String
+  id_in: [String]
+  id_not_in: [String]
+  id_contains: String
+  id_not_contains: String
+  id_starts_with: String
+  id_ends_with: String
+  id_not_starts_with: String
+  id_not_ends_with: String
+  pool: String
+  pool_not: String
+  pool_in: [String]
+  pool_not_in: [String]
+  pool_contains: String
+  pool_not_contains: String
+  pool_starts_with: String
+  pool_ends_with: String
+  pool_not_starts_with: String
+  pool_not_ends_with: String
+  blockNumber: BigInt
+  blockNumber_not: BigInt
+  blockNumber_in: [BigInt]
+  blockNumber_not_in: [BigInt]
+  blockNumber_gt: BigInt
+  blockNumber_lt: BigInt
+  blockNumber_gte: BigInt
+  blockNumber_lte: BigInt
+  rate: BigInt
+  rate_not: BigInt
+  rate_in: [BigInt]
+  rate_not_in: [BigInt]
+  rate_gt: BigInt
+  rate_lt: BigInt
+  rate_gte: BigInt
+  rate_lte: BigInt
+  timestamp: BigInt
+  timestamp_not: BigInt
+  timestamp_in: [BigInt]
+  timestamp_not_in: [BigInt]
+  timestamp_gt: BigInt
+  timestamp_lt: BigInt
+  timestamp_gte: BigInt
+  timestamp_lte: BigInt
+}
+
+type PoolPage {
+  items: [Pool!]!
+  pageInfo: PageInfo!
+}
+
+input PoolFilter {
+  AND: [PoolFilter]
+  OR: [PoolFilter]
+  id: String
+  id_not: String
+  id_in: [String]
+  id_not_in: [String]
+  id_contains: String
+  id_not_contains: String
+  id_starts_with: String
+  id_ends_with: String
+  id_not_starts_with: String
+  id_not_ends_with: String
+  lpToken: String
+  lpToken_not: String
+  lpToken_in: [String]
+  lpToken_not_in: [String]
+  lpToken_contains: String
+  lpToken_not_contains: String
+  lpToken_starts_with: String
+  lpToken_ends_with: String
+  lpToken_not_starts_with: String
+  lpToken_not_ends_with: String
+}
+
+type Reward {
+  id: String!
+  pool: String!
+  fromBlockNumber: BigInt!
+  toBlockNumber: BigInt!
+  noteId: BigInt!
+  amount: BigInt!
+  timestamp: BigInt!
+}
+
+type RewardPage {
+  items: [Reward!]!
+  pageInfo: PageInfo!
+}
+
+input RewardFilter {
+  AND: [RewardFilter]
+  OR: [RewardFilter]
+  id: String
+  id_not: String
+  id_in: [String]
+  id_not_in: [String]
+  id_contains: String
+  id_not_contains: String
+  id_starts_with: String
+  id_ends_with: String
+  id_not_starts_with: String
+  id_not_ends_with: String
+  pool: String
+  pool_not: String
+  pool_in: [String]
+  pool_not_in: [String]
+  pool_contains: String
+  pool_not_contains: String
+  pool_starts_with: String
+  pool_ends_with: String
+  pool_not_starts_with: String
+  pool_not_ends_with: String
+  fromBlockNumber: BigInt
+  fromBlockNumber_not: BigInt
+  fromBlockNumber_in: [BigInt]
+  fromBlockNumber_not_in: [BigInt]
+  fromBlockNumber_gt: BigInt
+  fromBlockNumber_lt: BigInt
+  fromBlockNumber_gte: BigInt
+  fromBlockNumber_lte: BigInt
+  toBlockNumber: BigInt
+  toBlockNumber_not: BigInt
+  toBlockNumber_in: [BigInt]
+  toBlockNumber_not_in: [BigInt]
+  toBlockNumber_gt: BigInt
+  toBlockNumber_lt: BigInt
+  toBlockNumber_gte: BigInt
+  toBlockNumber_lte: BigInt
+  noteId: BigInt
+  noteId_not: BigInt
+  noteId_in: [BigInt]
+  noteId_not_in: [BigInt]
+  noteId_gt: BigInt
+  noteId_lt: BigInt
+  noteId_gte: BigInt
+  noteId_lte: BigInt
+  amount: BigInt
+  amount_not: BigInt
+  amount_in: [BigInt]
+  amount_not_in: [BigInt]
+  amount_gt: BigInt
+  amount_lt: BigInt
+  amount_gte: BigInt
+  amount_lte: BigInt
+  timestamp: BigInt
+  timestamp_not: BigInt
+  timestamp_in: [BigInt]
+  timestamp_not_in: [BigInt]
+  timestamp_gt: BigInt
+  timestamp_lt: BigInt
+  timestamp_gte: BigInt
+  timestamp_lte: BigInt
+}
+
+type TotalReward {
+  id: BigInt!
+  amount: BigInt!
+  lastUpdated: BigInt!
+}
+
+type TotalRewardPage {
+  items: [TotalReward!]!
+  pageInfo: PageInfo!
+}
+
+input TotalRewardFilter {
+  AND: [TotalRewardFilter]
+  OR: [TotalRewardFilter]
+  id: BigInt
+  id_not: BigInt
+  id_in: [BigInt]
+  id_not_in: [BigInt]
+  id_gt: BigInt
+  id_lt: BigInt
+  id_gte: BigInt
+  id_lte: BigInt
+  amount: BigInt
+  amount_not: BigInt
+  amount_in: [BigInt]
+  amount_not_in: [BigInt]
+  amount_gt: BigInt
+  amount_lt: BigInt
+  amount_gte: BigInt
+  amount_lte: BigInt
+  lastUpdated: BigInt
+  lastUpdated_not: BigInt
+  lastUpdated_in: [BigInt]
+  lastUpdated_not_in: [BigInt]
+  lastUpdated_gt: BigInt
+  lastUpdated_lt: BigInt
+  lastUpdated_gte: BigInt
+  lastUpdated_lte: BigInt
+}
+
+type _meta {
+  status: JSON
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
