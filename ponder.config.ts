@@ -20,11 +20,7 @@ import {
   VAULT_MANAGER_DEPLOYMENT_BLOCK,
 } from './src/constants';
 
-const disableSnapshot = config.disableSnapshot;
-
-const lpIndexingStartBlock = disableSnapshot
-  ? REWARDS_DEPLOYMENT_BLOCK
-  : LAST_REWARDS_BLOCK;
+const lpIndexingStartBlock = LAST_REWARDS_BLOCK;
 
 // config
 export default createConfig({
