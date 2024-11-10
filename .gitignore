@@ -14,7 +14,6 @@ yarn-error.log*
 .env*.local
 
 # Ponder
-/generated/
 /.ponder/
 
 junit.xml
