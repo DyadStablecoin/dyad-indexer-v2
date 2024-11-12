@@ -204,7 +204,7 @@ async function getYieldsForPool(
   const lpSizes = [];
   let totalLiquidity = liquidityToUse;
   let totalXp = 0n;
-  let totalParticipants = 0;
+  let totalParticipants = noteLiquidities.length;
   if (liquidityToUse > 0n) {
     lpSizes.push(liquidityToUse);
     totalXp += xpToUse;
