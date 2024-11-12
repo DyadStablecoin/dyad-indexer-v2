@@ -1,7 +1,6 @@
 import { asc, desc, eq, graphql } from '@ponder/core';
-import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
-import { createPublicClient, formatUnits, getAddress, parseEther } from 'viem';
+import { createPublicClient, formatUnits, getAddress, parseEther, parseUnits } from 'viem';
 import { mainnet } from 'viem/chains';
 
 import { ApiContext, ponder, Schema } from '@/generated';
@@ -194,7 +193,7 @@ async function getYieldsForPool(
       ? parseEther(overrideLiquidity.toString())
       : amountDeposited;
   const xpToUse =
-    overrideXp !== undefined ? parseEther(overrideXp.toString()) : xpAmount;
+    overrideXp !== undefined ? parseUnits(overrideXp.toString(), 27) : xpAmount;
 
   const lpSizes = [];
   let totalLiquidity = liquidityToUse;
@@ -256,8 +255,8 @@ async function getYieldsForPool(
     medianLiquidity: medianLiquidityScaled,
     averageXp: totalXpScaled,
     totalXp: formatUnits(totalXp, 27),
-    noteLiquidity: formatUnits(amountDeposited, 18),
-    noteXp: formatUnits(xpAmount, 27),
+    noteLiquidity: formatUnits(liquidityToUse, 18),
+    noteXp: formatUnits(xpToUse, 27),
     rewardRate: formatUnits(rewardRate, 18),
     effectiveSize: noteBoostedSize,
     totalEffectiveSize,
