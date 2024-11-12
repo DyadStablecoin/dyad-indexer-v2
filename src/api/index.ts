@@ -104,8 +104,8 @@ ponder.get('/api/yields/:id', async (context) => {
   const simLiquidity: undefined | string = context.req.query('liquidity');
 
   const simParameters = {
-    xp: simXp ? Number(simXp) : undefined,
-    liquidity: simLiquidity ? Number(simLiquidity) : undefined,
+    xp: !isNaN(Number(simXp)) ? Number(simXp) : undefined,
+    liquidity: !isNaN(Number(simLiquidity)) ? Number(simLiquidity) : undefined,
   };
 
   if (simParameters.xp !== undefined && isNaN(simParameters.xp)) {
