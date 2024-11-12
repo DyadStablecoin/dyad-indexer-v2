@@ -95,6 +95,21 @@ ponder.get('/api/yield', async (context) => {
 ponder.get('/api/yields/:id', async (context) => {
   const id = context.req.param('id');
 
+  const simXp: undefined | string = context.req.query('xp');
+  const simLiquidity: undefined | string = context.req.query('liquidity');
+
+  const simParameters = {
+    xp: simXp ? Number(simXp) : undefined,
+    liquidity: simLiquidity ? Number(simLiquidity) : undefined,
+  };
+
+  if (simParameters.xp !== undefined && isNaN(simParameters.xp)) {
+    throw new HTTPException(400, { message: 'Invalid xp simulation value' });
+  }
+  if (simParameters.liquidity !== undefined && isNaN(simParameters.liquidity)) {
+    throw new HTTPException(400, { message: 'Invalid liquidity simulation value' });
+  }
+
   const results: Record<string, YieldReturnType> = {};
 
   const noteId = BigInt(id);
@@ -102,7 +117,7 @@ ponder.get('/api/yields/:id', async (context) => {
   const pools = await context.db.select().from(context.tables.Pool);
 
   for (const pool of pools) {
-    results[pool.id] = await getYieldsForPool(pool, noteId, context);
+    results[pool.id] = await getYieldsForPool(pool, noteId, context, simParameters);
   }
 
   return context.json(results);
@@ -112,7 +127,13 @@ async function getYieldsForPool(
   pool: { id: string; lpToken: string },
   noteId: bigint,
   context: ApiContext,
+  simParameters?: {
+    xp?: number;
+    liquidity?: number;
+  },
 ) {
+  const { xp: overrideXp, liquidity: overrideLiquidity } = simParameters ?? {};
+
   const liquidity = await context.db
     .select()
     .from(context.tables.Liquidity)
@@ -161,10 +182,18 @@ async function getYieldsForPool(
 
   const [amountDeposited, xpAmount, rewardRate] = balances;
 
-  let totalLiquidity = amountDeposited;
-  const lpSizes = [amountDeposited];
-  let totalXp = xpAmount;
-  let totalParticipants = noteLiquidities.length + 1; // +1 for current note
+  const liquidityToUse = overrideLiquidity !== undefined ? parseEther(overrideLiquidity.toString()) : amountDeposited;
+  const xpToUse = overrideXp !== undefined ? parseEther(overrideXp.toString()) : xpAmount;
+
+  const lpSizes = [];
+  let totalLiquidity = liquidityToUse;
+  let totalXp = 0n;
+  let totalParticipants = 0;
+  if (liquidityToUse > 0n) {
+    lpSizes.push(liquidityToUse);
+    totalXp += xpToUse;
+    totalParticipants++; // +1 for current note
+  }
   for (const noteLiquidity of noteLiquidities) {
     if (noteLiquidity.noteId === noteId) {
       // don't include current note in total participants
@@ -172,9 +201,9 @@ async function getYieldsForPool(
       totalParticipants--;
       continue;
     } else {
-      lpSizes.push(noteLiquidity.liquidity);
-      totalLiquidity += noteLiquidity.liquidity;
-      totalXp += noteLiquidity.xp;
+        lpSizes.push(noteLiquidity.liquidity);
+        totalLiquidity += noteLiquidity.liquidity;
+        totalXp += noteLiquidity.xp;
     }
   }
 
