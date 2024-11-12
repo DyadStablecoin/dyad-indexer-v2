@@ -107,7 +107,9 @@ ponder.get('/api/yields/:id', async (context) => {
     throw new HTTPException(400, { message: 'Invalid xp simulation value' });
   }
   if (simParameters.liquidity !== undefined && isNaN(simParameters.liquidity)) {
-    throw new HTTPException(400, { message: 'Invalid liquidity simulation value' });
+    throw new HTTPException(400, {
+      message: 'Invalid liquidity simulation value',
+    });
   }
 
   const results: Record<string, YieldReturnType> = {};
@@ -117,7 +119,12 @@ ponder.get('/api/yields/:id', async (context) => {
   const pools = await context.db.select().from(context.tables.Pool);
 
   for (const pool of pools) {
-    results[pool.id] = await getYieldsForPool(pool, noteId, context, simParameters);
+    results[pool.id] = await getYieldsForPool(
+      pool,
+      noteId,
+      context,
+      simParameters,
+    );
   }
 
   return context.json(results);
@@ -182,8 +189,12 @@ async function getYieldsForPool(
 
   const [amountDeposited, xpAmount, rewardRate] = balances;
 
-  const liquidityToUse = overrideLiquidity !== undefined ? parseEther(overrideLiquidity.toString()) : amountDeposited;
-  const xpToUse = overrideXp !== undefined ? parseEther(overrideXp.toString()) : xpAmount;
+  const liquidityToUse =
+    overrideLiquidity !== undefined
+      ? parseEther(overrideLiquidity.toString())
+      : amountDeposited;
+  const xpToUse =
+    overrideXp !== undefined ? parseEther(overrideXp.toString()) : xpAmount;
 
   const lpSizes = [];
   let totalLiquidity = liquidityToUse;
@@ -201,9 +212,9 @@ async function getYieldsForPool(
       totalParticipants--;
       continue;
     } else {
-        lpSizes.push(noteLiquidity.liquidity);
-        totalLiquidity += noteLiquidity.liquidity;
-        totalXp += noteLiquidity.xp;
+      lpSizes.push(noteLiquidity.liquidity);
+      totalLiquidity += noteLiquidity.liquidity;
+      totalXp += noteLiquidity.xp;
     }
   }
 
