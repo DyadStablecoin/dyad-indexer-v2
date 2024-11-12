@@ -23,7 +23,7 @@ interface RewardsResponse {
 }
 
 async function main() {
-  if (process.env.DISABLE_SNAPSHOT === "true") {
+  if (process.env.DISABLE_SNAPSHOT === 'true') {
     return;
   }
   const syncUrl = 'api.dyadstable.xyz';
