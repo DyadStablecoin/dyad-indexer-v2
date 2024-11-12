@@ -232,8 +232,8 @@ async function getYieldsForPool(
   );
 
   const noteBoostedSize = computeBoostedSize(
-    xpAmount,
-    amountDeposited,
+    xpToUse,
+    liquidityToUse,
     totalXpScaled,
     medianLiquidityScaled,
   );
@@ -245,8 +245,8 @@ async function getYieldsForPool(
     }
 
     const boostedSize = computeBoostedSize(
-      xpToUse,
-      liquidityToUse,
+      noteLiquidity.xp,
+      noteLiquidity.liquidity,
       totalXpScaled,
       medianLiquidityScaled,
     );
