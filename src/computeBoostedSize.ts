@@ -1,6 +1,11 @@
 import { formatUnits } from 'viem';
 
-import { LP_MIN, LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from './constants';
+import {
+  LP_MIN,
+  LP_TANH_FACTOR,
+  XP_BASE_FACTOR,
+  XP_TANH_FACTOR,
+} from './constants';
 
 export function computeBoostedSize(
   xp: bigint,
