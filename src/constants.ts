@@ -1,7 +1,7 @@
 const XP_BASE_FACTOR = 0.5;
 const XP_TANH_FACTOR = 3.5;
 const LP_TANH_FACTOR = 1;
-const LP_MIN = 1_000_000;
+const LP_MIN = 5_000_000;
 
 const BLOCK_TIME = 12;
 
