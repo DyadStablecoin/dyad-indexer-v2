@@ -98,8 +98,8 @@ describe('Reward Calculation', () => {
 
     expect(noteRewards[1] / totalRewards).toBeCloseTo(0.5267065, 7);
     expect(noteRewards[2] / totalRewards).toBeCloseTo(0.0239366, 7);
-    expect(noteRewards[3] / totalRewards).toBeCloseTo(0.0873210, 7);
+    expect(noteRewards[3] / totalRewards).toBeCloseTo(0.087321, 7);
     expect(noteRewards[4] / totalRewards).toBeCloseTo(0.3349509, 7);
-    expect(noteRewards[5] / totalRewards).toBeCloseTo(0.0270850, 7);
+    expect(noteRewards[5] / totalRewards).toBeCloseTo(0.027085, 7);
   });
 });
