@@ -1,6 +1,11 @@
 import { formatUnits } from 'viem';
 
-import { LP_TANH_FACTOR, XP_BASE_FACTOR, XP_TANH_FACTOR } from './constants';
+import {
+  LP_MIN,
+  LP_TANH_FACTOR,
+  XP_BASE_FACTOR,
+  XP_TANH_FACTOR,
+} from './constants';
 
 export function computeBoostedSize(
   xp: bigint,
@@ -11,7 +16,7 @@ export function computeBoostedSize(
   const scaledXp = Number(formatUnits(xp, 27));
   const scaledLiquidity = Number(formatUnits(liquidity, 18));
 
-  const lpDenominator = Math.max(100_000, medianLiquidityScaled);
+  const lpDenominator = Math.max(LP_MIN, medianLiquidityScaled);
 
   const tanhXP =
     XP_BASE_FACTOR + XP_TANH_FACTOR * Math.tanh(scaledXp / totalXpScaled);
