@@ -26,17 +26,21 @@ const lpIndexingStartBlock = LAST_REWARDS_BLOCK;
 export default createConfig({
   networks: {
     mainnet: {
-      chainId: 1, transport: fallback([
-        http(config.rpcUrl),
-        fallback([
-          http("https://eth.llamarpc.com"),
-          http("https://rpc.ankr.com/eth"),
-          http("https://eth-mainnet.public.blastapi.io"),
-          http("https://eth.rpc.blxrbdn.com")
-        ])
-      ], {
-        rank: false
-      })
+      chainId: 1,
+      transport: fallback(
+        [
+          http(config.rpcUrl),
+          fallback([
+            http('https://eth.llamarpc.com'),
+            http('https://rpc.ankr.com/eth'),
+            http('https://eth-mainnet.public.blastapi.io'),
+            http('https://eth.rpc.blxrbdn.com'),
+          ]),
+        ],
+        {
+          rank: false,
+        },
+      ),
     },
   },
   blocks: {
