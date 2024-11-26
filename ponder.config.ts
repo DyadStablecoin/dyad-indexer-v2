@@ -1,5 +1,5 @@
 import { createConfig, mergeAbis } from '@ponder/core';
-import { http, parseAbiItem } from 'viem';
+import { fallback, http, parseAbiItem } from 'viem';
 
 import { DNftAbi } from './abis/DNftAbi';
 import { ERC1967ProxyAbi } from './abis/ERC1967ProxyAbi';
@@ -25,7 +25,23 @@ const lpIndexingStartBlock = LAST_REWARDS_BLOCK;
 // config
 export default createConfig({
   networks: {
-    mainnet: { chainId: 1, transport: http(config.rpcUrl) },
+    mainnet: {
+      chainId: 1,
+      transport: fallback(
+        [
+          http(config.rpcUrl),
+          fallback([
+            http('https://eth.llamarpc.com'),
+            http('https://rpc.ankr.com/eth'),
+            http('https://eth-mainnet.public.blastapi.io'),
+            http('https://eth.rpc.blxrbdn.com'),
+          ]),
+        ],
+        {
+          rank: false,
+        },
+      ),
+    },
   },
   blocks: {
     GetXP: {
