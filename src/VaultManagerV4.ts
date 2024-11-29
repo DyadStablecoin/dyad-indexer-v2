@@ -110,6 +110,13 @@ async function updateNote(context: Context, id: bigint) {
     collateral = exoCollateral + BigInt(results[4].result[1]);
   }
 
+  if (id === BigInt(93)) {
+    console.log('collateral', collateral);
+    console.log('exoCollateral', exoCollateral);
+    console.log('xp', xp);
+    console.log(results);
+  }
+
   const { Note } = context.db;
   await Note.upsert({
     id: BigInt(id),
