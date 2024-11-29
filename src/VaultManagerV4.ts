@@ -105,9 +105,9 @@ async function updateNote(context: Context, id: bigint) {
   let exoCollateral = BigInt(0);
   let collateral = BigInt(0);
 
-  if (results[4].result) {
-    exoCollateral = results[4].result[0];
-    collateral = exoCollateral + results[4].result[1];
+  if (results[4].status === 'success') {
+    exoCollateral = BigInt(results[4].result[0]);
+    collateral = exoCollateral + BigInt(results[4].result[1]);
   }
 
   const { Note } = context.db;
