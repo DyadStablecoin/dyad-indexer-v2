@@ -120,6 +120,12 @@ export async function handleComputeRewards({
     functionName: 'lastUpdateBlock',
   });
 
+  console.log('lastOnchainUpdateBlock', lastOnchainUpdateBlock);
+  console.log('toBlock', toBlock);
+  console.log('config.relayApiKey is set', !!config.relayApiKey);
+  console.log('config.relayApiSecret is set', !!config.relayApiSecret);
+  console.log('config.railwayEnvironmentName', config.railwayEnvironmentName);
+
   if (
     lastOnchainUpdateBlock < toBlock &&
     config.relayApiKey &&
