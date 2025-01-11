@@ -1,4 +1,4 @@
-export const LAST_REWARDS_BLOCK = "21556603";
+export const LAST_REWARDS_BLOCK = 21556603;
 export const REWARDS = [
   {
     "id": "4",
