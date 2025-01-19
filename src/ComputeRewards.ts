@@ -138,6 +138,7 @@ export async function handleComputeRewards({
       relayerApiSecret: config.relayApiSecret,
     });
 
+    try {
     await defender.relaySigner.sendTransaction({
       to: ponderConfig.contracts.LPStakingFactory.address,
       data: encodeFunctionData({
@@ -146,7 +147,11 @@ export async function handleComputeRewards({
         args: [root as Hex, event.block.number],
       }),
       gasLimit: 100_000,
-    });
+      });
+    } catch (error) {
+      console.error('Error setting root onchain', error);
+      throw error;
+    }
   }
 }
 
